@@ -5,11 +5,38 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="weather icon" href="./assets/imgs/icon.png" />
   <title>Weather App</title>
 </head>
 <body>
   <div class="container">
     <header class="title">Weather App</header>
+    <!-- Aside Section  -->
+    <aside>
+      <!-- Search Section  -->
+      <div class="search-section">
+        <input class="city-search" type="text">
+        <button class="search-btn">Search</button>
+      </div>
+      <!-- History Section  -->
+      <ul class="history">
+        <li>Perris, CA</li>
+        <li>Los Angeles, CA</li>
+        <li>Bakersfield, CA</li>
+        <li>Los Santos, CA</li>
+        <li>Fontana, CA</li>
+      </ul>
+    </aside>
+    <main>
+      <section>
+        <h2 class="searched-city">Perris</h2>
+        <div class="city-details">
+          <p class="city-temp">Tempurate: <span id="currentCityTemp">54</span></p>
+          <p class="city-wind">Wind: <span id="currentCityWind">345</span></p>
+          <p class="city-humidity">Humidity:<span id="currentCityHumidity">31</span></p>
+        </div>
+      </section>
+    </main>
   </div>
 </body>
 <script src="./assets/js/script.js"></script>
