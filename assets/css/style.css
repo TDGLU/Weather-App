@@ -5,21 +5,45 @@
 }
 
 .container {
-  display: flex;
-  justify-content: center;
   height: 100vh;
   width: 100vw;
   background-color: rgb(46, 46, 46);
 }
 
 .title {
-  display: flex;
-  justify-content: center;
   text-align: center;
   width: 100%;
-  margin-top: 2rem;
   font-size: 3rem;
   font-weight: bolder;
   color: white;
+  background-color: rgb(22, 22, 22);
+  padding: 1rem;
+}
+
+.content-section {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+
+}
+
+aside {
+  color: white;
+  border: solid red;
+  width: 30%;
+  height: 90%;
+}
+
+main {
+  color: white;
+  border: solid blue;
+  height: 90%;
+  width: 70%;
+  padding: 1rem;
+}
+
+main section {
+  border: solid green;
+  
 }
 

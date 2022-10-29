@@ -11,32 +11,50 @@
 <body>
   <div class="container">
     <header class="title">Weather App</header>
-    <!-- Aside Section  -->
-    <aside>
-      <!-- Search Section  -->
-      <div class="search-section">
-        <input class="city-search" type="text">
-        <button class="search-btn">Search</button>
-      </div>
-      <!-- History Section  -->
-      <ul class="history">
-        <li>Perris, CA</li>
-        <li>Los Angeles, CA</li>
-        <li>Bakersfield, CA</li>
-        <li>Los Santos, CA</li>
-        <li>Fontana, CA</li>
-      </ul>
-    </aside>
-    <main>
-      <section>
-        <h2 class="searched-city">Perris</h2>
-        <div class="city-details">
-          <p class="city-temp">Tempurate: <span id="currentCityTemp">54</span></p>
-          <p class="city-wind">Wind: <span id="currentCityWind">345</span></p>
-          <p class="city-humidity">Humidity:<span id="currentCityHumidity">31</span></p>
+    <div class="content-section">
+      <!-- Aside Section  -->
+      <aside>
+        <!-- Search Section  -->
+        <div class="search-section">
+          <h3>Search for a City</h3>
+          <input class="city-search" type="text">
+          <button class="search-btn">Search</button>
         </div>
-      </section>
-    </main>
+        <!-- History Section  -->
+        <ul class="history">
+          <li>Perris, CA</li>
+          <li>Los Angeles, CA</li>
+          <li>Bakersfield, CA</li>
+          <li>Los Santos, CA</li>
+          <li>Fontana, CA</li>
+        </ul>
+      </aside>
+
+      <!-- Main Section  -->
+      <main>
+        <section>
+          <!-- Current City Information -->
+          <h2 class="searched-city">Perris</h2>
+          <div class="city-details">
+            <p class="city-temp">Tempurate: <span id="currentCityTemp">54</span></p>
+            <p class="city-wind">Wind: <span id="currentCityWind">345</span></p>
+            <p class="city-humidity">Humidity: <span id="currentCityHumidity">31</span></p>
+          </div>
+        </section>
+        <div class="five-day-forecast">
+          <h3>5-Day Forecast:</h3>
+          <div class="cards-container">
+            <div class="card">
+              <p class="card-date">10/29/2022</p>
+              <img src="./assets/imgs/icon.png" alt="" class="card-icon">
+              <p class="card-temp">Tempurate: <span>54</span></p>
+              <p class="card-wind">Wind: <span>345</span></p>
+              <p class="card-humidity">Humidity: <span>31</span></p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 </body>
 <script src="./assets/js/script.js"></script>
