@@ -44,6 +44,33 @@ main {
 
 main section {
   border: solid green;
-  
+  padding: 1rem;
 }
 
+.searched-city {
+  font-size: 2.5rem;
+}
+
+.city-details {
+  margin: 1rem 0;
+  font-size: 1.4rem;
+}
+
+/* Card */
+.card-icon {
+  width: 3rem;
+}
+
+.card {
+  display: flex;
+  border: solid pink;
+  flex-direction: column;
+  padding: 1.3rem;
+  height: 8rem;
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+}
