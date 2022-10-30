@@ -61,6 +61,11 @@
   font-size: 1rem;
 }
 
+.search-btn:hover {
+  opacity: 80%;
+  cursor: pointer;
+}
+
 aside {
   color: white;
   width: 30%;
@@ -99,6 +104,7 @@ aside {
 
 #clearHistory {
   display: flex;
+  justify-content: center;
   border: none;
   background: none;
   font-size: 1.3rem;
@@ -107,6 +113,7 @@ aside {
 
 #clearHistory:hover {
   color: rgb(214, 214, 214);
+  cursor: pointer;
 }
 
 #clearHistory:active {
