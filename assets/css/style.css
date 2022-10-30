@@ -175,8 +175,9 @@ main section {
   width: 7rem;
   margin: 0 1rem;
   background-color: rgb(0, 63, 180);
-  border-radius: 2.1rem;
+  border-radius: 14px;
 }
+
  span {
   display: flex;
  }
