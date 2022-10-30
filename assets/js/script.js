@@ -7,7 +7,8 @@ const searchBtn = document.getElementById('searchBtn')
 
 // History Section
 
-
+const history = document.getElementById('history')
+const historyItem = document.getElementById('historyItem')
 
 // API Section 
 

@@ -92,6 +92,15 @@ aside {
   width: 50%;
 }
 
+#clearHistory {
+  display: flex;
+  align-items: center;
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  margin: 1rem;
+}
+
 /* Main Content  */
 
 main {
