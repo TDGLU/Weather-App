@@ -67,10 +67,11 @@ aside {
 
 .history-title {
   display: flex;
+  font-size: 1.5rem;
   font-weight: bolder;
   color: black;
   justify-content: center;
-  margin: 3rem 0 0 0;
+  margin: 4rem 0 0 0;
 }
 
 .history {
@@ -94,11 +95,18 @@ aside {
 
 #clearHistory {
   display: flex;
-  align-items: center;
   border: none;
   background: none;
   font-size: 1.3rem;
-  margin: 1rem;
+  margin: 0 0 4rem 0;
+}
+
+#clearHistory:hover {
+  color: rgb(214, 214, 214);
+}
+
+#clearHistory:active {
+  color: white;
 }
 
 /* Main Content  */
