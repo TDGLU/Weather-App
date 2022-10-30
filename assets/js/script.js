@@ -13,7 +13,10 @@ const clearHistoryBtn = document.getElementById('clearHistory')
 
 // Current City Information
 
+const searchedCity = document.getElementById('searchedCity')
 const currentCityTemp = document.getElementById('currentCityTemp')
+const currentCityWind = document.getElementById('currentCityWind')
+const currentCityHumidity = document.getElementById('currentCityHumidity')
 
 // API Section 
 
@@ -22,13 +25,38 @@ let weatherApi = `https://api.openweathermap.org/data/2.5/weather?q=perris&appid
 
 console.log(weatherApi)
 
+let today = new Date();
+let dd = String(today.getDate()).padStart(2, '0');
+let mm = String(today.getMonth() + 1).padStart(2, '0');
+let yyyy = today.getFullYear();
+today = `(${mm}/${dd}/${yyyy})`;
+
+
 // Calls the weather API 
 function fetchWeather() {
+  searchText.textContent = 'Loading...'
   fetch(weatherApi)
   .then((response) => response.json())
-  .then((data) => console.log(data))
+  .then((data) => {
+
+    // let city = data[0].name
+    
+    // searchedCity.textContent = city;
+
+    console.log(data)
+  })
 }
 
-// fetchWeather()
+// 
 
+function getCityDetails(city) {
+    if (!! response.data) {
+      console.error('No City found')
+      fetchWeather()
+      return
+    }
+  })
+}
+
+// Search Button calls weather API
 searchBtn.addEventListener('click', fetchWeather)
