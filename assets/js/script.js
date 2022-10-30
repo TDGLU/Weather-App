@@ -8,7 +8,9 @@ const searchBtn = document.getElementById('searchBtn')
 // History Section
 
 const history = document.getElementById('history')
-const historyItem = document.getElementById('historyItem')
+const historyItem = document.querySelectorAll('.history-item')
+const clearHistoryBtn = document.getElementById('clearHistory')
+
 
 // API Section 
 

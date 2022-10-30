@@ -10,7 +10,9 @@
 </head>
 <body>
   <div class="container">
-    <header class="title">Weather App</header>
+    <header class="title">
+      <h1>Weather App</h1>
+    </header>
     <div class="content-section">
       <!-- Aside Section  -->
       <aside>
@@ -21,22 +23,24 @@
           <button class="search-btn" id="searchBtn">Search</button>
         </div>
         <!-- History Section  -->
-        <p class="history-title"><u>History</u></p>
+        <p class="history-title">History</p>
         <ul class="history" id="history">
-          <li class="history-item" id="historyItem">Perris, CA</li>
-          <li class="history-item" id="historyItem">Los Angeles, CA</li>
-          <li class="history-item" id="historyItem">Bakersfield, CA</li>
-          <li class="history-item" id="historyItem">Los Santos, CA</li>
-          <li class="history-item" id="historyItem">Fontana, CA</li>
+          <li class="history-item">Perris, CA</li>
+          <li class="history-item">Los Angeles, CA</li>
+          <li class="history-item">Bakersfield, CA</li>
+          <li class="history-item">Los Santos, CA</li>
+          <li class="history-item">Fontana, CA</li>
         </ul>
-        <button id="clearHistory"><u>Clear</u></button>
+        <div class="clearHistoryContainer">
+         <button id="clearHistory">Clear</button>
+        </div>
       </aside>
 
       <!-- Main Section  -->
       <main>
         <section>
           <!-- Current City Information -->
-          <h2 class="searched-city"><u>Perris</u></h2>
+          <h2 class="searched-city">Perris</h2>
           <div class="city-details">
             <p class="city-temp">Tempurate: <span id="currentCityTemp">54</span></p>
             <p class="city-wind">Wind: <span id="currentCityWind">345</span></p>
