@@ -25,22 +25,25 @@ const cardDate = document.getElementById('cardDate')
 // API Section 
 
 let APIKey = '7b23df2e93e0f4913efaf4a0404c91c0'
-let CityInput = searchText
-let weatherApi = `https://api.openweathermap.org/data/2.5/weather?q=${CityInput}&appid=${APIKey}`
+let weatherApi = `https://api.openweathermap.org/data/2.5/weather?q=${citySearched}&appid=${APIKey}`
+let citySearched = searchText
 
 console.log(weatherApi)
 
-// Grab todays date 
+// Grab todays date
+
+const todaysDate = document.getElementById('todaysDate')
 
 let today = new Date();
 let dd = String(today.getDate()).padStart(2, '0');
 let mm = String(today.getMonth() + 1).padStart(2, '0');
 let yyyy = today.getFullYear();
-today = `(${mm}/${dd}/${yyyy})`;
+today = `${mm}/${dd}/${yyyy}`;
 
-cardDate.textContent = today
+todaysDate.textContent = today
 
 // Calls the weather API 
+
 function fetchWeather() {
   searchText.textContent = 'Loading...'
   fetch(weatherApi)
@@ -52,10 +55,10 @@ function fetchWeather() {
     let cityWind = data.wind.speed
     let cityHumidity = data.main.humidity
 
-    searchedCity = cityName
-    currentCityTemp = cityTemp
-    currentCityWind = cityWind
-    currentCityHumidity = cityHumidity
+    searchedCity.textContent = cityName
+    currentCityTemp.textContent = cityTemp
+    currentCityWind.textContent = cityWind
+    currentCityHumidity.textContent = cityHumidity
 
 
     console.log(data)
