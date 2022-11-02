@@ -2,7 +2,7 @@ console.log('Hello')
 
 // Search Section 
 
-const searchText = document.getElementById('searchText')
+const searchText = document.getElementById('searchText').value
 const searchBtn = document.getElementById('searchBtn')
 
 // History Section
@@ -39,9 +39,9 @@ function fetchWeather() {
   .then((response) => response.json())
   .then((data) => {
 
-    // let city = data[0].name
+    let city = data[0].name
     
-    // searchedCity.textContent = city;
+    searchedCity.textContent = city;
 
     console.log(data)
   })

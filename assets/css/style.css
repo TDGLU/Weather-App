@@ -69,6 +69,11 @@
   cursor: pointer;
 }
 
+.search-btn:active {
+  opacity: 60%;
+  cursor: pointer;
+}
+
 aside {
   color: white;
   width: 30%;
