@@ -2,7 +2,7 @@ console.log('Hello')
 
 // Search Section 
 
-const searchText = document.getElementById('searchText').value
+const searchText = document.getElementById('searchText')
 const searchBtn = document.getElementById('searchBtn')
 
 // History Section
@@ -25,8 +25,8 @@ const cardDate = document.getElementById('cardDate')
 // API Section 
 
 let APIKey = '7b23df2e93e0f4913efaf4a0404c91c0'
+let citySearched = searchText.value
 let weatherApi = `https://api.openweathermap.org/data/2.5/weather?q=${citySearched}&appid=${APIKey}`
-let citySearched = searchText
 
 console.log(weatherApi)
 
@@ -50,10 +50,10 @@ function fetchWeather() {
   .then((response) => response.json())
   .then((data) => {
 
-    let cityName = data.name
-    let cityTemp = data.main.temp
-    let cityWind = data.wind.speed
-    let cityHumidity = data.main.humidity
+    let cityName = data[0].name
+    let cityTemp = data[0].main.temp
+    let cityWind = data[0].wind.speed
+    let cityHumidity = data[0].main.humidity
 
     searchedCity.textContent = cityName
     currentCityTemp.textContent = cityTemp
