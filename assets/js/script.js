@@ -18,12 +18,19 @@ const currentCityTemp = document.getElementById('currentCityTemp')
 const currentCityWind = document.getElementById('currentCityWind')
 const currentCityHumidity = document.getElementById('currentCityHumidity')
 
+// Card Section
+
+const cardDate = document.getElementById('cardDate')
+
 // API Section 
 
 let APIKey = '7b23df2e93e0f4913efaf4a0404c91c0'
-let weatherApi = `https://api.openweathermap.org/data/2.5/weather?q=perris&appid=${APIKey}`
+let CityInput = searchText
+let weatherApi = `https://api.openweathermap.org/data/2.5/weather?q=${CityInput}&appid=${APIKey}`
 
 console.log(weatherApi)
+
+// Grab todays date 
 
 let today = new Date();
 let dd = String(today.getDate()).padStart(2, '0');
@@ -31,6 +38,7 @@ let mm = String(today.getMonth() + 1).padStart(2, '0');
 let yyyy = today.getFullYear();
 today = `(${mm}/${dd}/${yyyy})`;
 
+cardDate.textContent = today
 
 // Calls the weather API 
 function fetchWeather() {
@@ -39,22 +47,18 @@ function fetchWeather() {
   .then((response) => response.json())
   .then((data) => {
 
-    let city = data[0].name
-    
-    searchedCity.textContent = city;
+    let cityName = data.name
+    let cityTemp = data.main.temp
+    let cityWind = data.wind.speed
+    let cityHumidity = data.main.humidity
+
+    searchedCity = cityName
+    currentCityTemp = cityTemp
+    currentCityWind = cityWind
+    currentCityHumidity = cityHumidity
+
 
     console.log(data)
-  })
-}
-
-// 
-
-function getCityDetails(city) {
-    if (!! response.data) {
-      console.error('No City found')
-      fetchWeather()
-      return
-    }
   })
 }
 
