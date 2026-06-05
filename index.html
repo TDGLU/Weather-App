@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://api.openweathermap.org">
   <link rel="preconnect" href="https://openweathermap.org">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Fredoka:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="./assets/css/app.min.css">
+  <link rel="stylesheet" href="./assets/css/app.min.css?v=5">
   <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/icons/icon-512.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/images/icons/icon-192.png">
   <link rel="icon" type="image/png" sizes="128x128" href="./assets/images/icons/icon-128.png">
@@ -59,7 +59,7 @@
 
         <div class="panel history-panel">
           <p class="history-title">Recent Adventures</p>
-          <ul class="history" id="history"></ul>
+          <ul class="history scroll-region" id="history" data-scroll-axis="y"></ul>
           <div class="clearHistoryContainer">
             <button id="clearHistory" type="button">Clear history</button>
           </div>
@@ -139,7 +139,7 @@
 
         <div class="five-day-forecast panel-forecast">
           <h3 class="five-day-forcast-title">5-Day Forecast</h3>
-          <div class="cards-scroll">
+          <div class="cards-scroll scroll-region" data-scroll-axis="x" aria-label="Five-day forecast">
             <div class="cards-container"></div>
           </div>
         </div>
@@ -159,7 +159,7 @@
         <button type="button" class="search-btn compare-add-btn" id="compareAddBtn">Add</button>
         <button type="button" class="compare-clear-btn" id="compareClearBtn">Clear all</button>
       </div>
-      <div class="compare-scroll">
+      <div class="compare-scroll scroll-region" data-scroll-axis="x" aria-label="City comparison">
         <div class="compare-container" id="compareContainer">
           <p class="compare-empty" id="compareEmpty">No cities yet — add one above to start comparing.</p>
         </div>
@@ -167,6 +167,6 @@
     </section>
   </div>
 
-  <script src="./assets/js/app.min.js?v=4" defer></script>
+  <script src="./assets/js/app.min.js?v=5" defer></script>
 </body>
 </html>

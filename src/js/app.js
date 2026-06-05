@@ -10,6 +10,7 @@ import {
   renderHistory,
   upgradeHistoryLabels
 } from './history.js';
+import { initScrollRegions } from './scroll-regions.js';
 import { initTheme } from './theme.js';
 import {
   clearCurrentWeather,
@@ -73,6 +74,7 @@ function bindEvents() {
 async function bootstrap() {
   initDom();
   initTheme();
+  initScrollRegions();
   bindEvents();
 
   const dom = getDom();

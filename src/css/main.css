@@ -509,7 +509,7 @@ body {
   margin-bottom: 1rem;
 }
 
-.history {
+.history.scroll-region {
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -526,6 +526,15 @@ body {
   scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: rgba(99, 102, 241, 0.45) transparent;
+}
+
+.scroll-region:focus {
+  outline: none;
+}
+
+.scroll-region:focus-visible {
+  outline: 2px solid var(--input-focus-border);
+  outline-offset: 3px;
 }
 
 .history::-webkit-scrollbar {
@@ -956,7 +965,20 @@ body {
   overflow-y: hidden;
   padding: 1.35rem 0.5rem 1.35rem;
   margin: 0 -0.25rem;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+.cards-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.cards-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--radius-pill);
 }
 
 .cards-container {
@@ -967,15 +989,6 @@ body {
   min-height: min-content;
   overflow: visible;
   scroll-snap-type: x proximity;
-}
-
-.cards-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.cards-container::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: var(--radius-pill);
 }
 
 .card {
@@ -1305,7 +1318,11 @@ body {
   overflow-x: auto;
   overflow-y: visible;
   padding: 1rem 0.35rem 1.1rem;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 .compare-scroll::-webkit-scrollbar {
