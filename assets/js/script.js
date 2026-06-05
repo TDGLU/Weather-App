@@ -10,6 +10,8 @@ const THEME_KEY = 'weatherAppTheme';
 const MAX_HISTORY = 6;
 const MAX_COMPARE = 10;
 
+let latestSearchId = 0;
+
 // DOM Elements
 const searchText = document.getElementById('searchText');
 const searchBtn = document.getElementById('searchBtn');
@@ -352,6 +354,54 @@ function getAqiEntry(airData) {
   return airData && airData.list && airData.list[0] ? airData.list[0] : null;
 }
 
+function getAqiBaseClass(visualEl) {
+  return visualEl.classList.contains('compare-aqi-visual')
+    ? 'aqi-visual compare-aqi-visual'
+    : 'aqi-visual';
+}
+
+// Map PM2.5 (µg/m³) to thumb position along the gradient track
+function pm25ToThumbPercent(pm25, aqi) {
+  const anchors = [
+    { pm: 0, pos: 6 },
+    { pm: 12, pos: 18 },
+    { pm: 35, pos: 34 },
+    { pm: 55, pos: 52 },
+    { pm: 150, pos: 80 },
+    { pm: 300, pos: 94 }
+  ];
+  const fallback = { 1: 8, 2: 28, 3: 50, 4: 74, 5: 92 };
+
+  if (pm25 == null || Number.isNaN(pm25)) {
+    return fallback[aqi] ?? 50;
+  }
+
+  if (pm25 <= anchors[0].pm) return anchors[0].pos;
+  if (pm25 >= anchors[anchors.length - 1].pm) return anchors[anchors.length - 1].pos;
+
+  for (let i = 1; i < anchors.length; i += 1) {
+    const hi = anchors[i];
+    const lo = anchors[i - 1];
+    if (pm25 <= hi.pm) {
+      const t = (pm25 - lo.pm) / (hi.pm - lo.pm);
+      return lo.pos + t * (hi.pos - lo.pos);
+    }
+  }
+
+  return fallback[aqi] ?? 50;
+}
+
+function setAqiLoadingState(visualEl, labelEl, pmEl) {
+  if (!visualEl) return;
+  visualEl.className = `${getAqiBaseClass(visualEl)} is-loading`;
+  visualEl.setAttribute('data-aqi', '0');
+  visualEl.style.setProperty('--aqi-thumb-pos', '50%');
+  visualEl.setAttribute('aria-label', 'Loading air quality');
+  visualEl.setAttribute('aria-valuenow', '0');
+  if (labelEl) labelEl.textContent = 'Loading…';
+  if (pmEl) pmEl.textContent = '—';
+}
+
 function buildAqiSliderMarkup(extraClass) {
   const cls = extraClass ? `aqi-visual ${extraClass}` : 'aqi-visual';
   return `
@@ -368,13 +418,13 @@ function applyAqiVisual(visualEl, labelEl, pmEl, airData) {
   const entry = getAqiEntry(airData);
   if (!visualEl) return;
 
-  const baseClass = visualEl.classList.contains('compare-aqi-visual')
-    ? 'aqi-visual compare-aqi-visual'
-    : 'aqi-visual';
+  const baseClass = getAqiBaseClass(visualEl);
+  const thumb = visualEl.querySelector('.aqi-slider-thumb');
 
   if (!entry || entry.main?.aqi == null) {
     visualEl.setAttribute('data-aqi', '0');
     visualEl.className = baseClass;
+    visualEl.style.setProperty('--aqi-thumb-pos', '50%');
     visualEl.setAttribute('aria-label', 'Air quality unavailable');
     visualEl.setAttribute('aria-valuenow', '0');
     if (labelEl) labelEl.textContent = '—';
@@ -384,13 +434,21 @@ function applyAqiVisual(visualEl, labelEl, pmEl, airData) {
 
   const aqi = entry.main.aqi;
   const info = AQI_LEVELS[aqi] || { label: 'Unknown', class: 'aqi-lvl-unknown' };
+  const pm = entry.components?.pm2_5;
+  const thumbPos = pm25ToThumbPercent(pm, aqi);
+
+  // Reset thumb so CSS transition runs when switching cities
+  visualEl.setAttribute('data-aqi', '0');
+  visualEl.style.setProperty('--aqi-thumb-pos', '50%');
+  if (thumb) void thumb.offsetWidth;
+
   visualEl.setAttribute('data-aqi', String(aqi));
   visualEl.className = `${baseClass} ${info.class}`;
+  visualEl.style.setProperty('--aqi-thumb-pos', `${thumbPos}%`);
   visualEl.setAttribute('aria-label', `Air quality: ${info.label}`);
   visualEl.setAttribute('aria-valuenow', String(aqi));
   if (labelEl) labelEl.textContent = info.label;
 
-  const pm = entry.components?.pm2_5;
   if (pmEl) {
     pmEl.textContent = pm != null ? `PM2.5: ${pm.toFixed(1)} µg/m³` : '—';
   }
@@ -712,8 +770,16 @@ function updateCompareCard(cardEl, label, currentData, forecastDays, airData, er
 }
 
 async function loadCompareCardData(cardEl, cityLabel) {
+  const loadId = (cardEl._compareLoadId = (cardEl._compareLoadId || 0) + 1);
+  const aqiVisual = cardEl.querySelector('.compare-aqi-visual');
+  const aqiLabel = cardEl.querySelector('.compare-aqi-label');
+  const aqiPm = cardEl.querySelector('.compare-aqi-pm');
+  setAqiLoadingState(aqiVisual, aqiLabel, aqiPm);
+
   try {
     const { currentData, label, forecastData, airData } = await fetchWeatherBundle(cityLabel);
+    if (cardEl._compareLoadId !== loadId) return;
+
     const forecastDays = pickFiveForecastDays(forecastData);
     const resolvedKey = getHistoryCityKey(label);
     cardEl.dataset.cityKey = resolvedKey;
@@ -725,8 +791,18 @@ async function loadCompareCardData(cardEl, cityLabel) {
 
     updateCompareCard(cardEl, label, currentData, forecastDays, airData);
   } catch (err) {
+    if (cardEl._compareLoadId !== loadId) return;
     updateCompareCard(cardEl, cityLabel, null, [], null, err.message || 'Could not load');
   }
+}
+
+function refreshCompareCardForLabel(label) {
+  if (!compareContainer || !label) return;
+  const key = getHistoryCityKey(label);
+  const card = [...compareContainer.querySelectorAll('.compare-card')].find(
+    (el) => el.dataset.cityKey === key
+  );
+  if (card) loadCompareCardData(card, label);
 }
 
 async function renderCompare() {
@@ -816,12 +892,16 @@ async function doSearch(searchVal) {
     return;
   }
 
+  const searchId = ++latestSearchId;
+  setAqiLoadingState(currentAqiVisual, currentAqiLabel, currentPm25);
+
   const originalBtnText = searchBtn.textContent;
   searchBtn.textContent = 'Loading...';
-  searchBtn.disabled = true;
+  searchBtn.setAttribute('aria-busy', 'true');
 
   try {
     const { currentData, label, forecastData, airData } = await fetchWeatherBundle(searchVal);
+    if (searchId !== latestSearchId) return;
 
     searchedCity.textContent = label;
     updateCurrentWeather(currentData, airData);
@@ -834,7 +914,10 @@ async function doSearch(searchVal) {
     // Keep search input in sync with what we searched
     searchText.value = label;
 
+    refreshCompareCardForLabel(label);
+
   } catch (err) {
+    if (searchId !== latestSearchId) return;
     console.error(err);
     searchedCity.textContent = 'Error';
     clearCurrentWeather();
@@ -844,8 +927,10 @@ async function doSearch(searchVal) {
       if (d) d.textContent = err.message || 'Not found';
     }
   } finally {
-    searchBtn.textContent = originalBtnText || 'Search';
-    searchBtn.disabled = false;
+    if (searchId === latestSearchId) {
+      searchBtn.textContent = originalBtnText || 'Search';
+      searchBtn.removeAttribute('aria-busy');
+    }
   }
 }
 
