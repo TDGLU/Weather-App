@@ -132,7 +132,7 @@ export function updateCurrentWeather(currentData, airData) {
 }
 
 function updateForecastCard(cardEl, entry) {
-  if (!entry?.main?.weather?.[0]) return;
+  if (!entry?.main || !entry?.weather?.[0]) return;
 
   const dateP = cardEl.querySelector('.card-date');
   const weatherDescP = cardEl.querySelector('.card-weather-desc');
