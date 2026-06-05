@@ -391,17 +391,6 @@ function pm25ToThumbPercent(pm25, aqi) {
   return fallback[aqi] ?? 50;
 }
 
-function setAqiLoadingState(visualEl, labelEl, pmEl) {
-  if (!visualEl) return;
-  visualEl.className = `${getAqiBaseClass(visualEl)} is-loading`;
-  visualEl.setAttribute('data-aqi', '0');
-  visualEl.style.setProperty('--aqi-thumb-pos', '50%');
-  visualEl.setAttribute('aria-label', 'Loading air quality');
-  visualEl.setAttribute('aria-valuenow', '0');
-  if (labelEl) labelEl.textContent = 'Loading…';
-  if (pmEl) pmEl.textContent = '—';
-}
-
 function buildAqiSliderMarkup(extraClass) {
   const cls = extraClass ? `aqi-visual ${extraClass}` : 'aqi-visual';
   return `
@@ -419,7 +408,6 @@ function applyAqiVisual(visualEl, labelEl, pmEl, airData) {
   if (!visualEl) return;
 
   const baseClass = getAqiBaseClass(visualEl);
-  const thumb = visualEl.querySelector('.aqi-slider-thumb');
 
   if (!entry || entry.main?.aqi == null) {
     visualEl.setAttribute('data-aqi', '0');
@@ -436,11 +424,6 @@ function applyAqiVisual(visualEl, labelEl, pmEl, airData) {
   const info = AQI_LEVELS[aqi] || { label: 'Unknown', class: 'aqi-lvl-unknown' };
   const pm = entry.components?.pm2_5;
   const thumbPos = pm25ToThumbPercent(pm, aqi);
-
-  // Reset thumb so CSS transition runs when switching cities
-  visualEl.setAttribute('data-aqi', '0');
-  visualEl.style.setProperty('--aqi-thumb-pos', '50%');
-  if (thumb) void thumb.offsetWidth;
 
   visualEl.setAttribute('data-aqi', String(aqi));
   visualEl.className = `${baseClass} ${info.class}`;
@@ -771,11 +754,6 @@ function updateCompareCard(cardEl, label, currentData, forecastDays, airData, er
 
 async function loadCompareCardData(cardEl, cityLabel) {
   const loadId = (cardEl._compareLoadId = (cardEl._compareLoadId || 0) + 1);
-  const aqiVisual = cardEl.querySelector('.compare-aqi-visual');
-  const aqiLabel = cardEl.querySelector('.compare-aqi-label');
-  const aqiPm = cardEl.querySelector('.compare-aqi-pm');
-  setAqiLoadingState(aqiVisual, aqiLabel, aqiPm);
-
   try {
     const { currentData, label, forecastData, airData } = await fetchWeatherBundle(cityLabel);
     if (cardEl._compareLoadId !== loadId) return;
@@ -893,7 +871,6 @@ async function doSearch(searchVal) {
   }
 
   const searchId = ++latestSearchId;
-  setAqiLoadingState(currentAqiVisual, currentAqiLabel, currentPm25);
 
   const originalBtnText = searchBtn.textContent;
   searchBtn.textContent = 'Loading...';
