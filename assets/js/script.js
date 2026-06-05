@@ -68,12 +68,23 @@ function renderHistory() {
   });
 }
 
+// Same city key for "Perris, US" and "Perris, California, US"
+function getHistoryCityKey(label) {
+  return getCityQuery(label).toLowerCase();
+}
+
+// Old history used "City, US" — upgrade to full label when state is missing
+function labelNeedsUpgrade(label) {
+  const parts = (label || '').split(',').map((p) => p.trim()).filter(Boolean);
+  return parts.length === 2 && /^[A-Z]{2}$/i.test(parts[1]);
+}
+
 // Add a city to history (dedup + recent first + limit)
 function addToHistory(cityLabel) {
   if (!cityLabel) return;
+  const cityKey = getHistoryCityKey(cityLabel);
   let history = loadHistory();
-  // remove existing (case-insensitive match)
-  history = history.filter(h => h.toLowerCase() !== cityLabel.toLowerCase());
+  history = history.filter((h) => getHistoryCityKey(h) !== cityKey);
   // add to front
   history.unshift(cityLabel);
   // limit
@@ -95,6 +106,68 @@ function getCityQuery(searchVal) {
   // take before first comma, or whole
   const part = trimmed.split(',')[0].trim();
   return part || trimmed;
+}
+
+// Build display label: City, State, Country (state omitted when unavailable)
+function formatLocationLabel(city, state, country) {
+  const parts = [(city || '').trim()];
+  const statePart = (state || '').trim();
+  const countryPart = (country || '').trim();
+  if (statePart) parts.push(statePart);
+  if (countryPart) parts.push(countryPart);
+  return parts.filter(Boolean).join(', ');
+}
+
+// Build City, State, Country from a weather API response
+async function buildLabelFromWeatherData(currentData, cityQuery) {
+  const cityName = currentData.name || cityQuery;
+  const country = currentData.sys && currentData.sys.country ? currentData.sys.country : '';
+  let state = '';
+  if (currentData.coord) {
+    state = await getStateFromCoords(currentData.coord.lat, currentData.coord.lon);
+  }
+  return formatLocationLabel(cityName, state, country);
+}
+
+// Resolve full label for a history entry (city name or partial label)
+async function resolveLocationLabel(searchVal) {
+  const cityQuery = getCityQuery(searchVal);
+  if (!cityQuery) return searchVal;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityQuery)}&appid=${APIKey}&units=imperial`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return searchVal;
+    const currentData = await res.json();
+    return buildLabelFromWeatherData(currentData, cityQuery);
+  } catch {
+    return searchVal;
+  }
+}
+
+// Upgrade stored history labels to City, State, Country
+async function upgradeHistoryLabels() {
+  const history = loadHistory();
+  const upgraded = await Promise.all(
+    history.map((label) => (labelNeedsUpgrade(label) ? resolveLocationLabel(label) : label))
+  );
+  if (upgraded.some((label, i) => label !== history[i])) {
+    saveHistory(upgraded);
+  }
+  return upgraded;
+}
+
+// Resolve state/region via reverse geocoding (OpenWeather current weather has no state field)
+async function getStateFromCoords(lat, lon) {
+  if (lat == null || lon == null) return '';
+  const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${APIKey}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data[0] && data[0].state ? data[0].state : '';
+  } catch {
+    return '';
+  }
 }
 
 // Format date from unix ts to M/D/YYYY (no leading zero on month/day to match original style)
@@ -183,8 +256,10 @@ async function doSearch(searchVal) {
     const currentData = await currentRes.json();
     const forecastData = await forecastRes.json();
 
+    const label = await buildLabelFromWeatherData(currentData, cityQuery);
+
     // Update CURRENT weather
-    searchedCity.textContent = currentData.name || cityQuery;
+    searchedCity.textContent = label;
     currentCityTemp.textContent = Math.round(currentData.main.temp);
     currentCityWind.textContent = Math.round(currentData.wind.speed);
     currentCityHumidity.textContent = currentData.main.humidity;
@@ -192,8 +267,6 @@ async function doSearch(searchVal) {
     // Update 5-day forecast cards
     updateFiveDayForecast(forecastData);
 
-    // Add to history using resolved name + country (e.g. "Perris, US")
-    const label = `${currentData.name}, ${currentData.sys && currentData.sys.country ? currentData.sys.country : 'US'}`;
     addToHistory(label);
 
     // Keep search input in sync with what we searched
@@ -243,7 +316,7 @@ historyList.addEventListener('click', (e) => {
 });
 
 // Initialize app
-function init() {
+async function init() {
   setTodaysDate();
 
   // Seed some example history on very first run (like original static list)
@@ -254,13 +327,11 @@ function init() {
     history = seeds;
   }
 
-  // Render (now has items)
+  // Upgrade legacy "City, US" entries to "City, State, Country"
+  history = await upgradeHistoryLabels();
   renderHistory();
 
-  // Auto-load weather for last (most recent) history item so app shows data immediately
   const defaultCity = history[0] || 'Perris, US';
-
-  // Set input to default and fetch immediately so app "works" on load
   searchText.value = defaultCity;
   doSearch(defaultCity);
 }
