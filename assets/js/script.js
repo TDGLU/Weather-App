@@ -2,6 +2,7 @@
 
 const APIKey = '7b23df2e93e0f4913efaf4a0404c91c0';
 const HISTORY_KEY = 'weatherAppHistory';
+const THEME_KEY = 'weatherAppTheme';
 const MAX_HISTORY = 6;
 
 // DOM Elements
@@ -16,7 +17,40 @@ const currentCityWind = document.getElementById('currentCityWind');
 const currentCityHumidity = document.getElementById('currentCityHumidity');
 
 const todaysDate = document.getElementById('todaysDate');
+const themeToggle = document.getElementById('themeToggle');
 const cards = document.querySelectorAll('.card');
+
+function getTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+}
+
+function updateThemeToggleUi(theme) {
+  if (!themeToggle) return;
+  const isDark = theme === 'dark';
+  themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+  themeToggle.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+  themeToggle.classList.toggle('is-dark', isDark);
+}
+
+function setTheme(theme) {
+  const next = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem(THEME_KEY, next);
+  updateThemeToggleUi(next);
+}
+
+function initTheme() {
+  const stored = localStorage.getItem(THEME_KEY);
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
+  setTheme(theme);
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      setTheme(getTheme() === 'dark' ? 'light' : 'dark');
+    });
+  }
+}
 
 // Format as Month Day, Year (e.g. June 5, 2026)
 function formatLongDate(date) {
@@ -336,6 +370,7 @@ historyList.addEventListener('click', (e) => {
 
 // Initialize app
 async function init() {
+  initTheme();
   setTodaysDate();
 
   // Seed some example history on very first run (like original static list)

@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./assets/css/style.css">
   <link rel="weather icon" href="./assets/imgs/icon.png" />
+  <script src="./assets/js/theme-init.js"></script>
   <title>Weather App</title>
 </head>
 <body>
@@ -18,6 +19,11 @@
   </div>
 
   <div class="container">
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" title="Toggle light / dark mode">
+      <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
+      <span class="theme-icon theme-icon-moon" aria-hidden="true">☽</span>
+    </button>
+
     <header class="title">
       <div class="title-banner">
         <h1>Weather App</h1>
