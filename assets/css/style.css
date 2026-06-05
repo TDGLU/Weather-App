@@ -568,7 +568,7 @@ body {
 
 /* Current weather */
 .current-weather {
-  padding: 1.75rem 2rem;
+  padding: 1.35rem 1.5rem 1.5rem;
 }
 
 .searched-city {
@@ -577,7 +577,40 @@ body {
   font-weight: 700;
   color: var(--text-deep);
   line-height: 1.2;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.65rem;
+}
+
+.current-weather-hero {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.current-hero-icon-wrap {
+  width: 3.25rem;
+  height: 3.25rem;
+  flex-shrink: 0;
+}
+
+.current-hero-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.current-weather-desc {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-deep);
+  line-height: 1.25;
+}
+
+.current-weather .city-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+  overflow: visible;
 }
 
 .city-details {
@@ -586,6 +619,29 @@ body {
   gap: 1rem;
   padding: 0.35rem 0;
   overflow: visible;
+}
+
+.current-weather .stat-pill-compact {
+  flex: unset;
+  min-width: 0;
+  padding: 0.5rem 0.55rem;
+  border-radius: 0.85rem;
+  gap: 0.15rem;
+}
+
+.current-weather .stat-pill-compact .stat-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+}
+
+.current-weather .stat-pill-compact .stat-value {
+  font-size: 0.95rem;
+  line-height: 1.2;
+  flex-wrap: wrap;
+}
+
+.current-weather .stat-pill-compact .stat-unit {
+  font-size: 0.68rem;
 }
 
 .stat-pill {
@@ -753,7 +809,8 @@ body {
 /* Weather icons keep true colors in app dark mode (not inverted like UI chrome) */
 [data-theme='dark'] .card-icon,
 [data-theme='dark'] .compare-icon,
-[data-theme='dark'] .compare-day-icon {
+[data-theme='dark'] .compare-day-icon,
+[data-theme='dark'] .current-hero-icon {
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
 }
 
@@ -762,31 +819,37 @@ body {
 .weather-anim-sun .compare-icon,
 .weather-anim-cloud .compare-icon,
 .weather-anim-sun .compare-day-icon,
-.weather-anim-cloud .compare-day-icon {
+.weather-anim-cloud .compare-day-icon,
+.weather-anim-sun .current-hero-icon,
+.weather-anim-cloud .current-hero-icon {
   animation: iconFloat 3.2s ease-in-out infinite;
 }
 
 .weather-anim-rain .card-icon,
 .weather-anim-rain .compare-icon,
-.weather-anim-rain .compare-day-icon {
+.weather-anim-rain .compare-day-icon,
+.weather-anim-rain .current-hero-icon {
   animation: iconRain 2.2s ease-in-out infinite;
 }
 
 .weather-anim-storm .card-icon,
 .weather-anim-storm .compare-icon,
-.weather-anim-storm .compare-day-icon {
+.weather-anim-storm .compare-day-icon,
+.weather-anim-storm .current-hero-icon {
   animation: iconStorm 1.4s ease-in-out infinite;
 }
 
 .weather-anim-snow .card-icon,
 .weather-anim-snow .compare-icon,
-.weather-anim-snow .compare-day-icon {
+.weather-anim-snow .compare-day-icon,
+.weather-anim-snow .current-hero-icon {
   animation: iconSnow 3.5s ease-in-out infinite;
 }
 
 .weather-anim-mist .card-icon,
 .weather-anim-mist .compare-icon,
-.weather-anim-mist .compare-day-icon {
+.weather-anim-mist .compare-day-icon,
+.weather-anim-mist .current-hero-icon {
   animation: iconMist 4s ease-in-out infinite;
 }
 
@@ -1218,7 +1281,11 @@ body {
   }
 
   .current-weather {
-    padding: 1.25rem;
+    padding: 1.1rem;
+  }
+
+  .current-weather .city-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .stat-pill {

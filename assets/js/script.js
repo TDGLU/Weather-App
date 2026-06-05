@@ -17,9 +17,21 @@ const historyList = document.getElementById('history');
 const clearHistoryBtn = document.getElementById('clearHistory');
 
 const searchedCity = document.getElementById('searchedCity');
+const currentWeatherIconWrap = document.getElementById('currentWeatherIconWrap');
+const currentWeatherIcon = document.getElementById('currentWeatherIcon');
+const currentWeatherDesc = document.getElementById('currentWeatherDesc');
 const currentCityTemp = document.getElementById('currentCityTemp');
-const currentCityWind = document.getElementById('currentCityWind');
+const currentFeelsLike = document.getElementById('currentFeelsLike');
+const currentHighLow = document.getElementById('currentHighLow');
 const currentCityHumidity = document.getElementById('currentCityHumidity');
+const currentWind = document.getElementById('currentWind');
+const currentGust = document.getElementById('currentGust');
+const currentPressure = document.getElementById('currentPressure');
+const currentVisibility = document.getElementById('currentVisibility');
+const currentClouds = document.getElementById('currentClouds');
+const currentPrecip = document.getElementById('currentPrecip');
+const currentSunrise = document.getElementById('currentSunrise');
+const currentSunset = document.getElementById('currentSunset');
 
 const todaysDate = document.getElementById('todaysDate');
 const themeToggle = document.getElementById('themeToggle');
@@ -292,6 +304,106 @@ async function getStateFromCoords(lat, lon) {
 // Format forecast card date from unix timestamp
 function formatCardDate(dt) {
   return formatLongDate(new Date(dt * 1000));
+}
+
+function degToCompass(deg) {
+  if (deg == null || Number.isNaN(deg)) return '';
+  const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+
+function formatCityLocalTime(unixUtc, tzOffsetSec) {
+  if (unixUtc == null) return '—';
+  const offset = tzOffsetSec || 0;
+  const d = new Date((unixUtc + offset) * 1000);
+  return d.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC'
+  });
+}
+
+function metersToMiles(m) {
+  if (m == null) return null;
+  return m / 1609.34;
+}
+
+function mmToInches(mm) {
+  return mm * 0.0393701;
+}
+
+function setText(el, text) {
+  if (el) el.textContent = text ?? '—';
+}
+
+function clearCurrentWeather() {
+  setText(currentWeatherDesc, '—');
+  if (currentWeatherIcon) {
+    currentWeatherIcon.src = './assets/imgs/icon.png';
+    currentWeatherIcon.alt = '';
+  }
+  if (currentWeatherIconWrap) {
+    currentWeatherIconWrap.className = 'weather-icon-wrap weather-anim-cloud current-hero-icon-wrap';
+  }
+  [
+    currentCityTemp, currentFeelsLike, currentHighLow, currentCityHumidity,
+    currentWind, currentGust, currentPressure, currentVisibility, currentClouds,
+    currentPrecip, currentSunrise, currentSunset
+  ].forEach((el) => setText(el, '—'));
+}
+
+function updateCurrentWeather(currentData) {
+  const main = currentData.main || {};
+  const weather = currentData.weather && currentData.weather[0];
+  const wind = currentData.wind || {};
+  const clouds = currentData.clouds || {};
+  const tz = currentData.timezone || 0;
+
+  if (weather) {
+    setText(currentWeatherDesc, formatWeatherDescription(weather.description));
+    setWeatherIcon(currentWeatherIconWrap, currentWeatherIcon, weather.icon, weather.description);
+  }
+
+  setText(currentCityTemp, main.temp != null ? Math.round(main.temp) : '—');
+  setText(currentFeelsLike, main.feels_like != null ? Math.round(main.feels_like) : '—');
+
+  if (main.temp_max != null && main.temp_min != null) {
+    setText(currentHighLow, `${Math.round(main.temp_max)}° / ${Math.round(main.temp_min)}°`);
+  } else {
+    setText(currentHighLow, '—');
+  }
+
+  setText(currentCityHumidity, main.humidity != null ? main.humidity : '—');
+
+  const windSpeed = wind.speed != null ? Math.round(wind.speed) : null;
+  const windDir = degToCompass(wind.deg);
+  if (windSpeed != null) {
+    setText(currentWind, windDir ? `${windSpeed} mph ${windDir}` : `${windSpeed} mph`);
+  } else {
+    setText(currentWind, '—');
+  }
+
+  setText(currentGust, wind.gust != null ? `${Math.round(wind.gust)} mph` : '—');
+  setText(currentPressure, main.pressure != null ? `${main.pressure} hPa` : '—');
+
+  const visMi = metersToMiles(currentData.visibility);
+  setText(currentVisibility, visMi != null ? `${visMi.toFixed(1)} mi` : '—');
+
+  setText(currentClouds, clouds.all != null ? clouds.all : '—');
+
+  const rainMm = currentData.rain && currentData.rain['1h'];
+  const snowMm = currentData.snow && currentData.snow['1h'];
+  if (rainMm != null) {
+    setText(currentPrecip, `${mmToInches(rainMm).toFixed(2)} in rain`);
+  } else if (snowMm != null) {
+    setText(currentPrecip, `${mmToInches(snowMm).toFixed(2)} in snow`);
+  } else {
+    setText(currentPrecip, '0 in');
+  }
+
+  setText(currentSunrise, formatCityLocalTime(currentData.sys?.sunrise, tz));
+  setText(currentSunset, formatCityLocalTime(currentData.sys?.sunset, tz));
 }
 
 // Update a single forecast card
@@ -609,6 +721,7 @@ async function doSearch(searchVal) {
   const cityQuery = getCityQuery(searchVal);
   if (!cityQuery) {
     searchedCity.textContent = 'Enter a city';
+    clearCurrentWeather();
     return;
   }
 
@@ -619,11 +732,8 @@ async function doSearch(searchVal) {
   try {
     const { currentData, label, forecastData } = await fetchWeatherBundle(searchVal);
 
-    // Update CURRENT weather
     searchedCity.textContent = label;
-    currentCityTemp.textContent = Math.round(currentData.main.temp);
-    currentCityWind.textContent = Math.round(currentData.wind.speed);
-    currentCityHumidity.textContent = currentData.main.humidity;
+    updateCurrentWeather(currentData);
 
     // Update 5-day forecast cards
     updateFiveDayForecast(forecastData);
@@ -636,9 +746,7 @@ async function doSearch(searchVal) {
   } catch (err) {
     console.error(err);
     searchedCity.textContent = 'Error';
-    currentCityTemp.textContent = '--';
-    currentCityWind.textContent = '--';
-    currentCityHumidity.textContent = '--';
+    clearCurrentWeather();
     // Show message in first card date area as fallback
     if (cards[0]) {
       const d = cards[0].querySelector('.card-date');
@@ -694,6 +802,7 @@ async function init() {
   } else {
     searchText.value = '';
     searchedCity.textContent = 'Search for a city';
+    clearCurrentWeather();
   }
 }
 

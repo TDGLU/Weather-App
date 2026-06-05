@@ -56,18 +56,60 @@
       <main class="main-content">
         <section class="panel current-weather">
           <h2 class="searched-city" id="searchedCity">Search for a city</h2>
-          <div class="city-details">
-            <div class="stat-pill">
-              <span class="stat-label">Temperature</span>
-              <span class="stat-value"><span id="currentCityTemp">54</span><span class="stat-unit">°F</span></span>
+          <div class="current-weather-hero">
+            <span class="weather-icon-wrap weather-anim-cloud current-hero-icon-wrap" id="currentWeatherIconWrap">
+              <img src="./assets/imgs/icon.png" alt="" class="current-hero-icon card-icon" id="currentWeatherIcon">
+            </span>
+            <p class="current-weather-desc weather-type-label" id="currentWeatherDesc">—</p>
+          </div>
+          <div class="city-details" id="cityDetails">
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Temp</span>
+              <span class="stat-value"><span id="currentCityTemp">—</span><span class="stat-unit">°F</span></span>
             </div>
-            <div class="stat-pill">
-              <span class="stat-label">Wind</span>
-              <span class="stat-value"><span id="currentCityWind">345</span><span class="stat-unit"> mph</span></span>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Feels like</span>
+              <span class="stat-value"><span id="currentFeelsLike">—</span><span class="stat-unit">°F</span></span>
             </div>
-            <div class="stat-pill">
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">High / Low</span>
+              <span class="stat-value" id="currentHighLow">—</span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
               <span class="stat-label">Humidity</span>
-              <span class="stat-value"><span id="currentCityHumidity">31</span><span class="stat-unit">%</span></span>
+              <span class="stat-value"><span id="currentCityHumidity">—</span><span class="stat-unit">%</span></span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Wind</span>
+              <span class="stat-value" id="currentWind">—</span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Gusts</span>
+              <span class="stat-value" id="currentGust">—</span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Pressure</span>
+              <span class="stat-value" id="currentPressure">—</span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Visibility</span>
+              <span class="stat-value" id="currentVisibility">—</span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Clouds</span>
+              <span class="stat-value"><span id="currentClouds">—</span><span class="stat-unit">%</span></span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Precip (1h)</span>
+              <span class="stat-value" id="currentPrecip">—</span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Sunrise</span>
+              <span class="stat-value" id="currentSunrise">—</span>
+            </div>
+            <div class="stat-pill stat-pill-compact">
+              <span class="stat-label">Sunset</span>
+              <span class="stat-value" id="currentSunset">—</span>
             </div>
           </div>
         </section>
