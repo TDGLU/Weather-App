@@ -1,6 +1,8 @@
 mcps/
 .DS_Store
 Thumbs.db
+node_modules/
+package-lock.json
 
 # Local user data must never be committed
 .env
