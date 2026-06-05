@@ -2,8 +2,10 @@
 
 const APIKey = '7b23df2e93e0f4913efaf4a0404c91c0';
 const HISTORY_KEY = 'weatherAppHistory';
+const COMPARE_KEY = 'weatherAppCompare';
 const THEME_KEY = 'weatherAppTheme';
 const MAX_HISTORY = 6;
+const MAX_COMPARE = 10;
 
 // DOM Elements
 const searchText = document.getElementById('searchText');
@@ -18,6 +20,12 @@ const currentCityHumidity = document.getElementById('currentCityHumidity');
 
 const todaysDate = document.getElementById('todaysDate');
 const themeToggle = document.getElementById('themeToggle');
+const compareInput = document.getElementById('compareInput');
+const compareAddBtn = document.getElementById('compareAddBtn');
+const compareAddCurrent = document.getElementById('compareAddCurrent');
+const compareClearBtn = document.getElementById('compareClearBtn');
+const compareContainer = document.getElementById('compareContainer');
+const compareEmpty = document.getElementById('compareEmpty');
 const cards = document.querySelectorAll('.card');
 
 function getTheme() {
@@ -279,6 +287,236 @@ function updateFiveDayForecast(forecastData) {
   });
 }
 
+// Fetch current weather for a city
+async function fetchCurrentWeather(searchVal) {
+  const cityQuery = getCityQuery(searchVal);
+  if (!cityQuery) throw new Error('Enter a city name');
+
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityQuery)}&appid=${APIKey}&units=imperial`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `City not found: ${cityQuery}`);
+  }
+
+  const currentData = await res.json();
+  const label = await buildLabelFromWeatherData(currentData, cityQuery);
+  return { currentData, label, cityQuery };
+}
+
+// --- City comparison ---
+function loadCompare() {
+  try {
+    const saved = localStorage.getItem(COMPARE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCompare(cities) {
+  localStorage.setItem(COMPARE_KEY, JSON.stringify(cities));
+}
+
+function isInCompareList(label, list) {
+  const key = getHistoryCityKey(label);
+  return list.some((c) => getHistoryCityKey(c) === key);
+}
+
+function addToCompareList(searchVal) {
+  const trimmed = (searchVal || '').trim();
+  if (!trimmed) return { ok: false, message: 'Enter a city to compare' };
+
+  let list = loadCompare();
+  if (isInCompareList(trimmed, list)) {
+    return { ok: false, message: 'City already in comparison' };
+  }
+  if (list.length >= MAX_COMPARE) {
+    return { ok: false, message: `Maximum ${MAX_COMPARE} cities` };
+  }
+
+  list.push(trimmed);
+  saveCompare(list);
+  return { ok: true };
+}
+
+function removeFromCompareList(searchVal) {
+  const key = getHistoryCityKey(searchVal);
+  const list = loadCompare().filter((c) => getHistoryCityKey(c) !== key);
+  saveCompare(list);
+}
+
+function buildCompareCardShell(cityLabel) {
+  const card = document.createElement('article');
+  card.className = 'compare-card is-loading';
+  card.dataset.cityKey = getHistoryCityKey(cityLabel);
+
+  card.innerHTML = `
+    <button type="button" class="compare-remove" aria-label="Remove from comparison">&times;</button>
+    <h4 class="compare-city">${cityLabel}</h4>
+    <span class="weather-icon-wrap weather-anim-cloud">
+      <img src="./assets/imgs/icon.png" alt="" class="compare-icon card-icon">
+    </span>
+    <p class="compare-desc">Loading...</p>
+    <div class="compare-stats">
+      <div class="compare-stat">
+        <span class="compare-stat-label">Temp</span>
+        <span class="compare-stat-value"><span class="compare-temp">--</span><span class="stat-unit">°F</span></span>
+      </div>
+      <div class="compare-stat">
+        <span class="compare-stat-label">Wind</span>
+        <span class="compare-stat-value"><span class="compare-wind">--</span><span class="stat-unit"> mph</span></span>
+      </div>
+      <div class="compare-stat">
+        <span class="compare-stat-label">Humidity</span>
+        <span class="compare-stat-value"><span class="compare-humidity">--</span><span class="stat-unit">%</span></span>
+      </div>
+    </div>
+  `;
+
+  card.querySelector('.compare-remove').addEventListener('click', () => {
+    removeFromCompareList(cityLabel);
+    renderCompare();
+  });
+
+  return card;
+}
+
+function updateCompareCard(cardEl, label, currentData, errorMsg) {
+  cardEl.classList.remove('is-loading');
+
+  const cityEl = cardEl.querySelector('.compare-city');
+  const iconWrap = cardEl.querySelector('.weather-icon-wrap');
+  const iconImg = cardEl.querySelector('.compare-icon');
+  const descEl = cardEl.querySelector('.compare-desc');
+  const tempEl = cardEl.querySelector('.compare-temp');
+  const windEl = cardEl.querySelector('.compare-wind');
+  const humEl = cardEl.querySelector('.compare-humidity');
+
+  if (errorMsg) {
+    if (cityEl) cityEl.textContent = label;
+    if (descEl) descEl.textContent = errorMsg;
+    if (tempEl) tempEl.textContent = '--';
+    if (windEl) windEl.textContent = '--';
+    if (humEl) humEl.textContent = '--';
+    cardEl.classList.add('is-error');
+    return;
+  }
+
+  cardEl.classList.remove('is-error');
+  if (cityEl) cityEl.textContent = label;
+
+  const weather = currentData.weather && currentData.weather[0];
+  if (descEl) descEl.textContent = weather ? weather.description : '';
+  if (tempEl) tempEl.textContent = Math.round(currentData.main.temp);
+  if (windEl) windEl.textContent = Math.round(currentData.wind ? currentData.wind.speed : 0);
+  if (humEl) humEl.textContent = currentData.main.humidity;
+
+  if (iconImg && weather) {
+    const iconCode = weather.icon || '01d';
+    iconImg.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+    iconImg.alt = weather.description || 'weather icon';
+    if (iconWrap) {
+      iconWrap.className = `weather-icon-wrap ${getWeatherAnimClass(iconCode)}`;
+    }
+  }
+}
+
+async function loadCompareCardData(cardEl, cityLabel) {
+  try {
+    const { currentData, label } = await fetchCurrentWeather(cityLabel);
+    const resolvedKey = getHistoryCityKey(label);
+    cardEl.dataset.cityKey = resolvedKey;
+
+    let list = loadCompare();
+    const oldKey = getHistoryCityKey(cityLabel);
+    list = list.map((c) => (getHistoryCityKey(c) === oldKey ? label : c));
+    saveCompare(list);
+
+    updateCompareCard(cardEl, label, currentData);
+  } catch (err) {
+    updateCompareCard(cardEl, cityLabel, null, err.message || 'Could not load');
+  }
+}
+
+async function renderCompare() {
+  if (!compareContainer) return;
+
+  const cities = loadCompare();
+  compareContainer.innerHTML = '';
+
+  if (cities.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'compare-empty';
+    empty.id = 'compareEmpty';
+    empty.textContent = 'No cities yet — add one above to start comparing.';
+    compareContainer.appendChild(empty);
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  cities.forEach((cityLabel) => {
+    const card = buildCompareCardShell(cityLabel);
+    fragment.appendChild(card);
+    loadCompareCardData(card, cityLabel);
+  });
+  compareContainer.appendChild(fragment);
+}
+
+async function handleAddCompare(searchVal) {
+  const result = addToCompareList(searchVal);
+  if (!result.ok) {
+    if (compareInput) compareInput.focus();
+    return result;
+  }
+  if (compareInput) compareInput.value = '';
+  await renderCompare();
+  return result;
+}
+
+function setCompareControlsLoading(loading) {
+  if (compareAddBtn) {
+    compareAddBtn.disabled = loading;
+    compareAddBtn.textContent = loading ? 'Adding...' : 'Add';
+  }
+  if (compareAddCurrent) compareAddCurrent.disabled = loading;
+}
+
+function initCompare() {
+  if (!compareContainer) return;
+
+  renderCompare();
+
+  if (compareAddBtn && compareInput) {
+    const runAdd = async () => {
+      setCompareControlsLoading(true);
+      await handleAddCompare(compareInput.value);
+      setCompareControlsLoading(false);
+    };
+    compareAddBtn.addEventListener('click', runAdd);
+    compareInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') runAdd();
+    });
+  }
+
+  if (compareAddCurrent) {
+    compareAddCurrent.addEventListener('click', async () => {
+      const current = searchedCity.textContent.trim();
+      if (!current || current === 'Enter a city' || current === 'Error') return;
+      setCompareControlsLoading(true);
+      await handleAddCompare(current);
+      setCompareControlsLoading(false);
+    });
+  }
+
+  if (compareClearBtn) {
+    compareClearBtn.addEventListener('click', () => {
+      saveCompare([]);
+      renderCompare();
+    });
+  }
+}
+
 // Fetch current + forecast, update UI
 async function doSearch(searchVal) {
   const cityQuery = getCityQuery(searchVal);
@@ -287,29 +525,19 @@ async function doSearch(searchVal) {
     return;
   }
 
-  // Visual loading feedback
   const originalBtnText = searchBtn.textContent;
   searchBtn.textContent = 'Loading...';
   searchBtn.disabled = true;
 
-  const currentUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityQuery)}&appid=${APIKey}&units=imperial`;
   const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(cityQuery)}&appid=${APIKey}&units=imperial`;
 
   try {
-    const [currentRes, forecastRes] = await Promise.all([
-      fetch(currentUrl),
+    const [{ currentData, label }, forecastRes] = await Promise.all([
+      fetchCurrentWeather(searchVal),
       fetch(forecastUrl)
     ]);
 
-    if (!currentRes.ok) {
-      const err = await currentRes.json().catch(() => ({}));
-      throw new Error(err.message || `City not found: ${cityQuery}`);
-    }
-
-    const currentData = await currentRes.json();
-    const forecastData = await forecastRes.json();
-
-    const label = await buildLabelFromWeatherData(currentData, cityQuery);
+    const forecastData = forecastRes.ok ? await forecastRes.json() : { list: [] };
 
     // Update CURRENT weather
     searchedCity.textContent = label;
@@ -372,6 +600,7 @@ historyList.addEventListener('click', (e) => {
 async function init() {
   initTheme();
   setTodaysDate();
+  initCompare();
 
   // Seed some example history on very first run (like original static list)
   let history = loadHistory();

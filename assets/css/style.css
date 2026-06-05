@@ -735,23 +735,29 @@ body {
 }
 
 .weather-anim-sun .card-icon,
-.weather-anim-cloud .card-icon {
+.weather-anim-cloud .card-icon,
+.weather-anim-sun .compare-icon,
+.weather-anim-cloud .compare-icon {
   animation: iconFloat 3.2s ease-in-out infinite;
 }
 
-.weather-anim-rain .card-icon {
+.weather-anim-rain .card-icon,
+.weather-anim-rain .compare-icon {
   animation: iconRain 2.2s ease-in-out infinite;
 }
 
-.weather-anim-storm .card-icon {
+.weather-anim-storm .card-icon,
+.weather-anim-storm .compare-icon {
   animation: iconStorm 1.4s ease-in-out infinite;
 }
 
-.weather-anim-snow .card-icon {
+.weather-anim-snow .card-icon,
+.weather-anim-snow .compare-icon {
   animation: iconSnow 3.5s ease-in-out infinite;
 }
 
-.weather-anim-mist .card-icon {
+.weather-anim-mist .card-icon,
+.weather-anim-mist .compare-icon {
   animation: iconMist 4s ease-in-out infinite;
 }
 
@@ -810,11 +816,13 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .card-icon,
+  .compare-icon,
   .bubble {
     animation: none !important;
   }
 
   .card:hover,
+  .compare-card:hover,
   .history-item:hover,
   .stat-pill:hover,
   .search-btn:hover:not(:disabled) {
@@ -834,6 +842,246 @@ body {
 .card span:not(.stat-unit) {
   font-family: var(--font-display);
   font-size: 1.05rem;
+}
+
+/* City comparison */
+.compare-section {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 1600px;
+  margin: 1.25rem auto 0;
+  padding: 1.35rem 1.5rem 1.5rem;
+  overflow: visible;
+}
+
+.compare-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.compare-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 1.85rem);
+  font-weight: 600;
+  color: var(--text-deep);
+}
+
+.compare-hint {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.compare-add-current {
+  flex-shrink: 0;
+  padding: 0.55rem 1.1rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-deep);
+  background: var(--pill-bg);
+  border: 2px solid var(--input-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.compare-add-current:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--pill-hover);
+  border-color: var(--input-focus-border);
+}
+
+.compare-add-current:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.compare-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.compare-search {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.compare-add-btn {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 5.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.compare-clear-btn {
+  flex: 0 0 auto;
+  padding: 0.75rem 1.15rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  background: transparent;
+  border: 2px dashed var(--clear-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.compare-clear-btn:hover {
+  color: var(--clear-hover);
+  border-color: var(--clear-hover-border);
+  transform: translateY(-1px);
+}
+
+.compare-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 1rem 0.35rem 1.1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.compare-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.compare-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--radius-pill);
+}
+
+.compare-container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 1rem;
+  min-height: min-content;
+}
+
+.compare-empty {
+  width: 100%;
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.compare-card {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 11.5rem;
+  max-width: 14rem;
+  padding: 1.25rem 1rem 1.1rem;
+  text-align: center;
+  color: var(--text-on-glass);
+  background: var(--card-gradient);
+  border: 1.5px solid var(--card-border);
+  border-radius: 1.75rem;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+}
+
+.compare-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: var(--card-shadow-hover);
+  z-index: 2;
+}
+
+.compare-card.is-loading {
+  opacity: 0.85;
+}
+
+.compare-card.is-error {
+  border-color: rgba(248, 113, 113, 0.55);
+}
+
+.compare-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.55rem;
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--text-on-glass);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.compare-remove:hover {
+  background: rgba(0, 0, 0, 0.35);
+  transform: scale(1.08);
+}
+
+.compare-city {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.25;
+  padding: 0 1.5rem;
+  color: var(--text-on-glass);
+}
+
+.compare-desc {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  opacity: 0.9;
+  min-height: 1.2em;
+}
+
+.compare-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.compare-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+}
+
+.compare-stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+.compare-stat-value {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.compare-card .stat-unit {
+  color: rgba(248, 251, 255, 0.85);
+  font-size: 0.75rem;
 }
 
 /* Responsive */
@@ -873,5 +1121,22 @@ body {
 
   .card {
     min-width: 8.5rem;
+  }
+
+  .compare-section {
+    padding: 1.1rem 1rem 1.25rem;
+  }
+
+  .compare-add-row {
+    flex-direction: column;
+  }
+
+  .compare-add-btn,
+  .compare-clear-btn {
+    width: 100%;
+  }
+
+  .compare-card {
+    min-width: 10rem;
   }
 }

@@ -121,6 +121,26 @@
         </div>
       </main>
     </div>
+
+    <section class="panel compare-section">
+      <div class="compare-header">
+        <div>
+          <h3 class="compare-title">City Comparison</h3>
+          <p class="compare-hint">Add cities to compare weather side by side</p>
+        </div>
+        <button type="button" class="compare-add-current" id="compareAddCurrent">+ Add current city</button>
+      </div>
+      <div class="compare-add-row">
+        <input class="city-search compare-search" type="text" placeholder="Add another city..." id="compareInput">
+        <button type="button" class="search-btn compare-add-btn" id="compareAddBtn">Add</button>
+        <button type="button" class="compare-clear-btn" id="compareClearBtn">Clear all</button>
+      </div>
+      <div class="compare-scroll">
+        <div class="compare-container" id="compareContainer">
+          <p class="compare-empty" id="compareEmpty">No cities yet — add one above to start comparing.</p>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script src="./assets/js/script.js"></script>
