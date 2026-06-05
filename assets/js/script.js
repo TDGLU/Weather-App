@@ -32,6 +32,17 @@ const currentClouds = document.getElementById('currentClouds');
 const currentPrecip = document.getElementById('currentPrecip');
 const currentSunrise = document.getElementById('currentSunrise');
 const currentSunset = document.getElementById('currentSunset');
+const currentAqiVisual = document.getElementById('currentAqiVisual');
+const currentAqiLabel = document.getElementById('currentAqiLabel');
+const currentPm25 = document.getElementById('currentPm25');
+
+const AQI_LEVELS = {
+  1: { label: 'Good', class: 'aqi-lvl-1' },
+  2: { label: 'Fair', class: 'aqi-lvl-2' },
+  3: { label: 'Moderate', class: 'aqi-lvl-3' },
+  4: { label: 'Poor', class: 'aqi-lvl-4' },
+  5: { label: 'Very Poor', class: 'aqi-lvl-5' }
+};
 
 const todaysDate = document.getElementById('todaysDate');
 const themeToggle = document.getElementById('themeToggle');
@@ -337,6 +348,40 @@ function setText(el, text) {
   if (el) el.textContent = text ?? '—';
 }
 
+function getAqiEntry(airData) {
+  return airData && airData.list && airData.list[0] ? airData.list[0] : null;
+}
+
+function applyAqiVisual(visualEl, labelEl, pmEl, airData) {
+  const entry = getAqiEntry(airData);
+  if (!visualEl) return;
+
+  if (!entry || entry.main?.aqi == null) {
+    visualEl.setAttribute('data-aqi', '0');
+    visualEl.className = 'aqi-visual';
+    if (labelEl) labelEl.textContent = '—';
+    if (pmEl) pmEl.textContent = '—';
+    visualEl.setAttribute('aria-label', 'Air quality unavailable');
+    return;
+  }
+
+  const aqi = entry.main.aqi;
+  const info = AQI_LEVELS[aqi] || { label: 'Unknown', class: 'aqi-lvl-unknown' };
+  visualEl.setAttribute('data-aqi', String(aqi));
+  visualEl.className = `aqi-visual ${info.class}`;
+  visualEl.setAttribute('aria-label', `Air quality: ${info.label}, index ${aqi}`);
+  if (labelEl) labelEl.textContent = info.label;
+
+  const pm = entry.components?.pm2_5;
+  if (pmEl) {
+    pmEl.textContent = pm != null ? `PM2.5: ${pm.toFixed(1)} µg/m³` : '—';
+  }
+}
+
+function clearAqiVisual(visualEl, labelEl, pmEl) {
+  applyAqiVisual(visualEl, labelEl, pmEl, null);
+}
+
 function clearCurrentWeather() {
   setText(currentWeatherDesc, '—');
   if (currentWeatherIcon) {
@@ -351,9 +396,10 @@ function clearCurrentWeather() {
     currentWind, currentGust, currentPressure, currentVisibility, currentClouds,
     currentPrecip, currentSunrise, currentSunset
   ].forEach((el) => setText(el, '—'));
+  clearAqiVisual(currentAqiVisual, currentAqiLabel, currentPm25);
 }
 
-function updateCurrentWeather(currentData) {
+function updateCurrentWeather(currentData, airData) {
   const main = currentData.main || {};
   const weather = currentData.weather && currentData.weather[0];
   const wind = currentData.wind || {};
@@ -404,6 +450,7 @@ function updateCurrentWeather(currentData) {
 
   setText(currentSunrise, formatCityLocalTime(currentData.sys?.sunrise, tz));
   setText(currentSunset, formatCityLocalTime(currentData.sys?.sunset, tz));
+  applyAqiVisual(currentAqiVisual, currentAqiLabel, currentPm25, airData);
 }
 
 // Update a single forecast card
@@ -463,10 +510,27 @@ async function fetchForecast(cityQuery) {
   return forecastRes.ok ? forecastRes.json() : { list: [] };
 }
 
+async function fetchAirPollution(lat, lon) {
+  if (lat == null || lon == null) return null;
+  const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${APIKey}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
 async function fetchWeatherBundle(searchVal) {
   const { currentData, label, cityQuery } = await fetchCurrentWeather(searchVal);
-  const forecastData = await fetchForecast(cityQuery);
-  return { currentData, label, cityQuery, forecastData };
+  const lat = currentData.coord?.lat;
+  const lon = currentData.coord?.lon;
+  const [forecastData, airData] = await Promise.all([
+    fetchForecast(cityQuery),
+    fetchAirPollution(lat, lon)
+  ]);
+  return { currentData, label, cityQuery, forecastData, airData };
 }
 
 // --- City comparison ---
@@ -536,6 +600,19 @@ function buildCompareCardShell(cityLabel) {
       <img src="./assets/imgs/icon.png" alt="" class="compare-icon card-icon">
     </span>
     <p class="compare-desc">Loading...</p>
+    <div class="compare-aqi-wrap">
+      <div class="aqi-visual compare-aqi-visual" data-aqi="0" aria-label="Air quality">
+        <div class="aqi-scale" aria-hidden="true">
+          <span class="aqi-seg" data-level="1"></span>
+          <span class="aqi-seg" data-level="2"></span>
+          <span class="aqi-seg" data-level="3"></span>
+          <span class="aqi-seg" data-level="4"></span>
+          <span class="aqi-seg" data-level="5"></span>
+        </div>
+        <p class="aqi-label compare-aqi-label">—</p>
+      </div>
+      <p class="compare-aqi-pm aqi-pm-line">—</p>
+    </div>
     <div class="compare-stats">
       <div class="compare-stat">
         <span class="compare-stat-label">Temp</span>
@@ -583,13 +660,16 @@ function renderCompareForecast(cardEl, forecastDays) {
   });
 }
 
-function updateCompareCard(cardEl, label, currentData, forecastDays, errorMsg) {
+function updateCompareCard(cardEl, label, currentData, forecastDays, airData, errorMsg) {
   cardEl.classList.remove('is-loading');
 
   const cityEl = cardEl.querySelector('.compare-city');
   const iconWrap = cardEl.querySelector('.compare-current-icon-wrap') || cardEl.querySelector('.weather-icon-wrap:not(.compare-day-icon-wrap)');
   const iconImg = cardEl.querySelector('.compare-icon');
   const descEl = cardEl.querySelector('.compare-desc');
+  const aqiVisual = cardEl.querySelector('.compare-aqi-visual');
+  const aqiLabel = cardEl.querySelector('.compare-aqi-label');
+  const aqiPm = cardEl.querySelector('.compare-aqi-pm');
   const tempEl = cardEl.querySelector('.compare-temp');
   const windEl = cardEl.querySelector('.compare-wind');
   const humEl = cardEl.querySelector('.compare-humidity');
@@ -600,6 +680,7 @@ function updateCompareCard(cardEl, label, currentData, forecastDays, errorMsg) {
     if (tempEl) tempEl.textContent = '--';
     if (windEl) windEl.textContent = '--';
     if (humEl) humEl.textContent = '--';
+    clearAqiVisual(aqiVisual, aqiLabel, aqiPm);
     cardEl.classList.add('is-error');
     return;
   }
@@ -617,12 +698,13 @@ function updateCompareCard(cardEl, label, currentData, forecastDays, errorMsg) {
     setWeatherIcon(iconWrap, iconImg, weather.icon, weather.description);
   }
 
+  applyAqiVisual(aqiVisual, aqiLabel, aqiPm, airData);
   renderCompareForecast(cardEl, forecastDays || []);
 }
 
 async function loadCompareCardData(cardEl, cityLabel) {
   try {
-    const { currentData, label, forecastData } = await fetchWeatherBundle(cityLabel);
+    const { currentData, label, forecastData, airData } = await fetchWeatherBundle(cityLabel);
     const forecastDays = pickFiveForecastDays(forecastData);
     const resolvedKey = getHistoryCityKey(label);
     cardEl.dataset.cityKey = resolvedKey;
@@ -632,9 +714,9 @@ async function loadCompareCardData(cardEl, cityLabel) {
     list = list.map((c) => (getHistoryCityKey(c) === oldKey ? label : c));
     saveCompare(list);
 
-    updateCompareCard(cardEl, label, currentData, forecastDays);
+    updateCompareCard(cardEl, label, currentData, forecastDays, airData);
   } catch (err) {
-    updateCompareCard(cardEl, cityLabel, null, [], err.message || 'Could not load');
+    updateCompareCard(cardEl, cityLabel, null, [], null, err.message || 'Could not load');
   }
 }
 
@@ -730,10 +812,10 @@ async function doSearch(searchVal) {
   searchBtn.disabled = true;
 
   try {
-    const { currentData, label, forecastData } = await fetchWeatherBundle(searchVal);
+    const { currentData, label, forecastData, airData } = await fetchWeatherBundle(searchVal);
 
     searchedCity.textContent = label;
-    updateCurrentWeather(currentData);
+    updateCurrentWeather(currentData, airData);
 
     // Update 5-day forecast cards
     updateFiveDayForecast(forecastData);

@@ -644,6 +644,106 @@ body {
   font-size: 0.68rem;
 }
 
+/* Air quality visual */
+.stat-pill-aqi {
+  grid-column: 1 / -1;
+}
+
+.aqi-visual {
+  width: 100%;
+  margin: 0.15rem 0 0.2rem;
+}
+
+.aqi-scale {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  height: 10px;
+}
+
+.aqi-seg {
+  flex: 1;
+  border-radius: var(--radius-pill);
+  opacity: 0.28;
+  transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.aqi-seg[data-level='1'] { background: #22c55e; }
+.aqi-seg[data-level='2'] { background: #84cc16; }
+.aqi-seg[data-level='3'] { background: #eab308; }
+.aqi-seg[data-level='4'] { background: #f97316; }
+.aqi-seg[data-level='5'] { background: #ef4444; }
+
+.aqi-visual[data-aqi='1'] .aqi-seg[data-level='1'],
+.aqi-visual[data-aqi='2'] .aqi-seg[data-level='2'],
+.aqi-visual[data-aqi='3'] .aqi-seg[data-level='3'],
+.aqi-visual[data-aqi='4'] .aqi-seg[data-level='4'],
+.aqi-visual[data-aqi='5'] .aqi-seg[data-level='5'] {
+  opacity: 1;
+  transform: scaleY(1.35);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.aqi-label {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-deep);
+  text-align: center;
+}
+
+.aqi-pm-line {
+  font-size: 0.72rem !important;
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+  color: var(--text-soft) !important;
+  line-height: 1.2;
+  display: block;
+  text-align: center;
+}
+
+.compare-aqi-wrap {
+  width: 100%;
+  margin: 0.15rem 0 0.35rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.compare-aqi-visual {
+  max-width: 100%;
+}
+
+.compare-aqi-visual .aqi-label {
+  font-size: 0.78rem;
+  color: var(--text-on-glass);
+}
+
+.compare-aqi-pm {
+  margin-top: 0.25rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-align: center;
+  color: rgba(248, 251, 255, 0.88);
+}
+
+.aqi-visual.aqi-lvl-1 .aqi-label { color: #166534; }
+.aqi-visual.aqi-lvl-2 .aqi-label { color: #3f6212; }
+.aqi-visual.aqi-lvl-3 .aqi-label { color: #854d0e; }
+.aqi-visual.aqi-lvl-4 .aqi-label { color: #9a3412; }
+.aqi-visual.aqi-lvl-5 .aqi-label { color: #991b1b; }
+
+[data-theme='dark'] .aqi-visual.aqi-lvl-1 .aqi-label { color: #86efac; }
+[data-theme='dark'] .aqi-visual.aqi-lvl-2 .aqi-label { color: #bef264; }
+[data-theme='dark'] .aqi-visual.aqi-lvl-3 .aqi-label { color: #fde047; }
+[data-theme='dark'] .aqi-visual.aqi-lvl-4 .aqi-label { color: #fdba74; }
+[data-theme='dark'] .aqi-visual.aqi-lvl-5 .aqi-label { color: #fca5a5; }
+
+[data-theme='dark'] .compare-aqi-visual .aqi-label {
+  color: var(--text-on-glass);
+}
+
 .stat-pill {
   flex: 1 1 140px;
   display: flex;

@@ -111,6 +111,20 @@
               <span class="stat-label">Sunset</span>
               <span class="stat-value" id="currentSunset">—</span>
             </div>
+            <div class="stat-pill stat-pill-compact stat-pill-aqi">
+              <span class="stat-label">Air quality</span>
+              <div class="aqi-visual" id="currentAqiVisual" data-aqi="0" aria-label="Air quality index">
+                <div class="aqi-scale" aria-hidden="true">
+                  <span class="aqi-seg" data-level="1"></span>
+                  <span class="aqi-seg" data-level="2"></span>
+                  <span class="aqi-seg" data-level="3"></span>
+                  <span class="aqi-seg" data-level="4"></span>
+                  <span class="aqi-seg" data-level="5"></span>
+                </div>
+                <p class="aqi-label" id="currentAqiLabel">—</p>
+              </div>
+              <span class="stat-value aqi-pm-line"><span id="currentPm25">—</span></span>
+            </div>
           </div>
         </section>
 
