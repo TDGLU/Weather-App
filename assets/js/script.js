@@ -352,24 +352,42 @@ function getAqiEntry(airData) {
   return airData && airData.list && airData.list[0] ? airData.list[0] : null;
 }
 
+function buildAqiSliderMarkup(extraClass) {
+  const cls = extraClass ? `aqi-visual ${extraClass}` : 'aqi-visual';
+  return `
+    <div class="${cls}" data-aqi="0" role="slider" aria-label="Air quality" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0">
+      <div class="aqi-slider-track">
+        <div class="aqi-slider-thumb" aria-hidden="true"></div>
+      </div>
+      <p class="aqi-label">—</p>
+    </div>
+  `;
+}
+
 function applyAqiVisual(visualEl, labelEl, pmEl, airData) {
   const entry = getAqiEntry(airData);
   if (!visualEl) return;
 
+  const baseClass = visualEl.classList.contains('compare-aqi-visual')
+    ? 'aqi-visual compare-aqi-visual'
+    : 'aqi-visual';
+
   if (!entry || entry.main?.aqi == null) {
     visualEl.setAttribute('data-aqi', '0');
-    visualEl.className = 'aqi-visual';
+    visualEl.className = baseClass;
+    visualEl.setAttribute('aria-label', 'Air quality unavailable');
+    visualEl.setAttribute('aria-valuenow', '0');
     if (labelEl) labelEl.textContent = '—';
     if (pmEl) pmEl.textContent = '—';
-    visualEl.setAttribute('aria-label', 'Air quality unavailable');
     return;
   }
 
   const aqi = entry.main.aqi;
   const info = AQI_LEVELS[aqi] || { label: 'Unknown', class: 'aqi-lvl-unknown' };
   visualEl.setAttribute('data-aqi', String(aqi));
-  visualEl.className = `aqi-visual ${info.class}`;
-  visualEl.setAttribute('aria-label', `Air quality: ${info.label}, index ${aqi}`);
+  visualEl.className = `${baseClass} ${info.class}`;
+  visualEl.setAttribute('aria-label', `Air quality: ${info.label}`);
+  visualEl.setAttribute('aria-valuenow', String(aqi));
   if (labelEl) labelEl.textContent = info.label;
 
   const pm = entry.components?.pm2_5;
@@ -601,16 +619,7 @@ function buildCompareCardShell(cityLabel) {
     </span>
     <p class="compare-desc">Loading...</p>
     <div class="compare-aqi-wrap">
-      <div class="aqi-visual compare-aqi-visual" data-aqi="0" aria-label="Air quality">
-        <div class="aqi-scale" aria-hidden="true">
-          <span class="aqi-seg" data-level="1"></span>
-          <span class="aqi-seg" data-level="2"></span>
-          <span class="aqi-seg" data-level="3"></span>
-          <span class="aqi-seg" data-level="4"></span>
-          <span class="aqi-seg" data-level="5"></span>
-        </div>
-        <p class="aqi-label compare-aqi-label">—</p>
-      </div>
+      ${buildAqiSliderMarkup('compare-aqi-visual').replace('class="aqi-label"', 'class="aqi-label compare-aqi-label"')}
       <p class="compare-aqi-pm aqi-pm-line">—</p>
     </div>
     <div class="compare-stats">

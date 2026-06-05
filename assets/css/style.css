@@ -644,48 +644,102 @@ body {
   font-size: 0.68rem;
 }
 
-/* Air quality visual */
+/* Air quality — iOS-style slider */
 .stat-pill-aqi {
   grid-column: 1 / -1;
 }
 
 .aqi-visual {
   width: 100%;
-  margin: 0.15rem 0 0.2rem;
+  margin: 0.2rem 0 0.15rem;
+  padding: 0.15rem 0;
 }
 
-.aqi-scale {
-  display: flex;
-  gap: 4px;
+.aqi-slider-track {
+  position: relative;
   width: 100%;
-  height: 10px;
-}
-
-.aqi-seg {
-  flex: 1;
+  height: 6px;
   border-radius: var(--radius-pill);
-  opacity: 0.28;
-  transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  background: linear-gradient(
+    90deg,
+    #34c759 0%,
+    #a8e10d 22%,
+    #ffd60a 48%,
+    #ff9f0a 72%,
+    #ff453a 100%
+  );
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
-.aqi-seg[data-level='1'] { background: #22c55e; }
-.aqi-seg[data-level='2'] { background: #84cc16; }
-.aqi-seg[data-level='3'] { background: #eab308; }
-.aqi-seg[data-level='4'] { background: #f97316; }
-.aqi-seg[data-level='5'] { background: #ef4444; }
+.aqi-slider-thumb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f5 100%);
+  border: 0.5px solid rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 0.5px 0 rgba(0, 0, 0, 0.06),
+    0 2px 6px rgba(0, 0, 0, 0.16),
+    0 6px 14px rgba(0, 0, 0, 0.1);
+  transform: translate(-50%, -50%);
+  transition: left 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.25s ease;
+  pointer-events: none;
+}
 
-.aqi-visual[data-aqi='1'] .aqi-seg[data-level='1'],
-.aqi-visual[data-aqi='2'] .aqi-seg[data-level='2'],
-.aqi-visual[data-aqi='3'] .aqi-seg[data-level='3'],
-.aqi-visual[data-aqi='4'] .aqi-seg[data-level='4'],
-.aqi-visual[data-aqi='5'] .aqi-seg[data-level='5'] {
-  opacity: 1;
-  transform: scaleY(1.35);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+.aqi-visual[data-aqi='1'] .aqi-slider-thumb { left: 8%; }
+.aqi-visual[data-aqi='2'] .aqi-slider-thumb { left: 28%; }
+.aqi-visual[data-aqi='3'] .aqi-slider-thumb { left: 50%; }
+.aqi-visual[data-aqi='4'] .aqi-slider-thumb { left: 74%; }
+.aqi-visual[data-aqi='5'] .aqi-slider-thumb { left: 92%; }
+
+.aqi-visual[data-aqi='0'] .aqi-slider-thumb {
+  left: 50%;
+  opacity: 0.45;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.aqi-visual[data-aqi='1'] .aqi-slider-thumb,
+.aqi-visual.aqi-lvl-1 .aqi-slider-thumb {
+  box-shadow:
+    0 0 0 4px rgba(52, 199, 89, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.16);
+}
+
+.aqi-visual[data-aqi='2'] .aqi-slider-thumb,
+.aqi-visual.aqi-lvl-2 .aqi-slider-thumb {
+  box-shadow:
+    0 0 0 4px rgba(168, 225, 13, 0.28),
+    0 2px 6px rgba(0, 0, 0, 0.16);
+}
+
+.aqi-visual[data-aqi='3'] .aqi-slider-thumb,
+.aqi-visual.aqi-lvl-3 .aqi-slider-thumb {
+  box-shadow:
+    0 0 0 4px rgba(255, 214, 10, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.16);
+}
+
+.aqi-visual[data-aqi='4'] .aqi-slider-thumb,
+.aqi-visual.aqi-lvl-4 .aqi-slider-thumb {
+  box-shadow:
+    0 0 0 4px rgba(255, 159, 10, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.16);
+}
+
+.aqi-visual[data-aqi='5'] .aqi-slider-thumb,
+.aqi-visual.aqi-lvl-5 .aqi-slider-thumb {
+  box-shadow:
+    0 0 0 4px rgba(255, 69, 58, 0.28),
+    0 2px 6px rgba(0, 0, 0, 0.16);
 }
 
 .aqi-label {
-  margin-top: 0.35rem;
+  margin-top: 0.55rem;
   font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 700;
@@ -706,13 +760,23 @@ body {
 .compare-aqi-wrap {
   width: 100%;
   margin: 0.15rem 0 0.35rem;
-  padding: 0.45rem 0.5rem;
+  padding: 0.5rem 0.55rem 0.4rem;
   border-radius: 0.85rem;
   background: rgba(255, 255, 255, 0.1);
 }
 
 .compare-aqi-visual {
   max-width: 100%;
+  padding: 0.1rem 0.15rem;
+}
+
+.compare-aqi-visual .aqi-slider-track {
+  height: 5px;
+}
+
+.compare-aqi-visual .aqi-slider-thumb {
+  width: 22px;
+  height: 22px;
 }
 
 .compare-aqi-visual .aqi-label {
@@ -742,6 +806,17 @@ body {
 
 [data-theme='dark'] .compare-aqi-visual .aqi-label {
   color: var(--text-on-glass);
+}
+
+[data-theme='dark'] .aqi-slider-thumb {
+  background: linear-gradient(180deg, #fafafa 0%, #e4e4e7 100%);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='dark'] .aqi-slider-track {
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .stat-pill {
