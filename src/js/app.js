@@ -1,5 +1,5 @@
 import { fetchWeatherBundle } from './api.js';
-import { initCompare, refreshCompareCardForLabel } from './compare.js';
+import { addCityToCompare, initCompare, refreshCompareCardForLabel } from './compare.js';
 import { getDom, getForecastCards, initDom, setForecastCards } from './dom.js';
 import { formatLongDate, getCityQuery } from './format.js';
 import {
@@ -67,7 +67,7 @@ function bindEvents() {
     if (e.key === 'Enter') doSearch(dom.searchText.value);
   });
   dom.clearHistoryBtn.addEventListener('click', clearHistory);
-  bindHistoryDelegation(doSearch);
+  bindHistoryDelegation(doSearch, addCityToCompare);
 }
 
 async function bootstrap() {

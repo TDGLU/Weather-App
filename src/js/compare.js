@@ -23,6 +23,10 @@ function saveCompare(cities) {
   localStorage.setItem(COMPARE_KEY, JSON.stringify(cities));
 }
 
+function emitCompareChanged() {
+  document.dispatchEvent(new CustomEvent('weather-compare-changed'));
+}
+
 function isInCompareList(label, list) {
   const key = getHistoryCityKey(label);
   return list.some((c) => getHistoryCityKey(c) === key);
@@ -102,6 +106,7 @@ function buildCompareCardShell(cityLabel, onRemove) {
 
   card.querySelector('.compare-remove').addEventListener('click', () => {
     removeFromCompareList(cityLabel);
+    emitCompareChanged();
     onRemove();
   });
 
@@ -226,6 +231,22 @@ async function handleAddCompare(searchVal) {
   const { compareInput } = getDom();
   if (compareInput) compareInput.value = '';
   await renderCompare();
+  emitCompareChanged();
+  return result;
+}
+
+export function isCityInCompare(label) {
+  return isInCompareList(label, loadCompare());
+}
+
+export async function addCityToCompare(searchVal) {
+  const result = await handleAddCompare(searchVal);
+  if (result.ok) {
+    document.querySelector('.compare-section')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest'
+    });
+  }
   return result;
 }
 
@@ -287,6 +308,7 @@ export function initCompare() {
   if (compareClearBtn) {
     compareClearBtn.addEventListener('click', () => {
       saveCompare([]);
+      emitCompareChanged();
       renderCompare();
     });
   }
