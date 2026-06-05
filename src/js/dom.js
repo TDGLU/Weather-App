@@ -45,3 +45,19 @@ export function getDom() {
 export function setForecastCards(cards) {
   if (refs) refs.cards = cards;
 }
+
+/** Resolve forecast card elements (keeps refs.cards in sync with the DOM). */
+export function getForecastCards() {
+  if (!refs) return [];
+
+  if (refs.cards?.length) {
+    const connected = refs.cards.filter((card) => card.isConnected);
+    if (connected.length) return connected;
+  }
+
+  if (!refs.cardsContainer) return [];
+
+  const cards = [...refs.cardsContainer.querySelectorAll('.card')];
+  if (cards.length) setForecastCards(cards);
+  return cards;
+}

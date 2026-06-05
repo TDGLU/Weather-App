@@ -1,6 +1,6 @@
 import { ICON_FALLBACK } from './config.js';
 import { applyAqiVisual } from './aqi.js';
-import { getDom } from './dom.js';
+import { getDom, getForecastCards } from './dom.js';
 import {
   degToCompass,
   formatCardDate,
@@ -23,9 +23,9 @@ export function buildForecastCardMarkup() {
       <img src="${ICON_FALLBACK}" alt="" class="card-icon" width="64" height="64" decoding="async" loading="lazy">
     </span>
     <p class="card-weather-desc weather-type-label">—</p>
-    <p class="card-temp">Temp: <span>—</span><span class="stat-unit">°F</span></p>
-    <p class="card-wind">Wind: <span>—</span><span class="stat-unit"> mph</span></p>
-    <p class="card-humidity">Humidity: <span>—</span><span class="stat-unit">%</span></p>
+    <p class="card-temp">Temp: <span class="card-value">—</span><span class="stat-unit">°F</span></p>
+    <p class="card-wind">Wind: <span class="card-value">—</span><span class="stat-unit"> mph</span></p>
+    <p class="card-humidity">Humidity: <span class="card-value">—</span><span class="stat-unit">%</span></p>
   `;
 }
 
@@ -131,29 +131,29 @@ export function updateCurrentWeather(currentData, airData) {
   applyAqiVisual(dom.currentAqiVisual, dom.currentAqiLabel, dom.currentPm25, airData);
 }
 
-function updateCard(cardEl, entry) {
+function updateForecastCard(cardEl, entry) {
   if (!entry?.main?.weather?.[0]) return;
 
   const dateP = cardEl.querySelector('.card-date');
   const weatherDescP = cardEl.querySelector('.card-weather-desc');
   const iconWrap = cardEl.querySelector('.weather-icon-wrap');
   const iconImg = cardEl.querySelector('.card-icon');
-  const tempSpan = cardEl.querySelector('.card-temp span');
-  const windSpan = cardEl.querySelector('.card-wind span');
-  const humSpan = cardEl.querySelector('.card-humidity span');
+  const tempSpan = cardEl.querySelector('.card-temp .card-value');
+  const windSpan = cardEl.querySelector('.card-wind .card-value');
+  const humSpan = cardEl.querySelector('.card-humidity .card-value');
 
   if (dateP) dateP.textContent = formatCardDate(entry.dt);
   if (weatherDescP) weatherDescP.textContent = formatWeatherDescription(entry.weather[0].description);
   if (iconImg) setWeatherIcon(iconWrap, iconImg, entry.weather[0].icon, entry.weather[0].description);
-  if (tempSpan) tempSpan.textContent = Math.round(entry.main.temp);
-  if (windSpan) windSpan.textContent = Math.round(entry.wind?.speed ?? 0);
-  if (humSpan) humSpan.textContent = entry.main.humidity;
+  if (tempSpan) tempSpan.textContent = String(Math.round(entry.main.temp ?? 0));
+  if (windSpan) windSpan.textContent = String(Math.round(entry.wind?.speed ?? 0));
+  if (humSpan) humSpan.textContent = entry.main.humidity != null ? String(entry.main.humidity) : '—';
 }
 
 export function updateFiveDayForecast(forecastData) {
-  const { cards } = getDom();
+  const cards = getForecastCards();
   const days = pickFiveForecastDays(forecastData);
   cards.forEach((card, i) => {
-    if (days[i]) updateCard(card, days[i]);
+    if (days[i]) updateForecastCard(card, days[i]);
   });
 }

@@ -1,6 +1,6 @@
 import { fetchWeatherBundle } from './api.js';
 import { initCompare, refreshCompareCardForLabel } from './compare.js';
-import { getDom, initDom, setForecastCards } from './dom.js';
+import { getDom, getForecastCards, initDom, setForecastCards } from './dom.js';
 import { formatLongDate, getCityQuery } from './format.js';
 import {
   addToHistory,
@@ -50,7 +50,7 @@ async function doSearch(searchVal) {
     console.error(err);
     dom.searchedCity.textContent = 'Error';
     clearCurrentWeather();
-    const dateEl = dom.cards[0]?.querySelector('.card-date');
+    const dateEl = getForecastCards()[0]?.querySelector('.card-date');
     if (dateEl) dateEl.textContent = err.message || 'Not found';
   } finally {
     if (searchId === latestSearchId) {
@@ -77,7 +77,9 @@ async function bootstrap() {
 
   const dom = getDom();
   dom.todaysDate.textContent = formatLongDate(new Date());
-  setForecastCards(initForecastCards());
+  const forecastCards = initForecastCards();
+  setForecastCards(forecastCards);
+  getForecastCards();
   initCompare();
 
   let history = loadHistory();

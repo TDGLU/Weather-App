@@ -13,6 +13,7 @@ await esbuild.build({
   outfile: path.join(root, 'assets', 'js', 'app.min.js'),
   bundle: true,
   minify: true,
+  minifyIdentifiers: false,
   target: ['es2020'],
   legalComments: 'none'
 });

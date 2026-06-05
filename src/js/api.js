@@ -74,18 +74,20 @@ export async function fetchAirPollution(lat, lon) {
   }
 }
 
+async function fetchWeatherBundleRaw(searchVal) {
+  const { currentData, label, cityQuery } = await fetchCurrentWeather(searchVal);
+  const lat = currentData.coord?.lat;
+  const lon = currentData.coord?.lon;
+  const [forecastData, airData] = await Promise.all([
+    fetchForecast(cityQuery),
+    fetchAirPollution(lat, lon)
+  ]);
+  return { currentData, label, cityQuery, forecastData, airData };
+}
+
 export async function fetchWeatherBundle(searchVal) {
   const cityQuery = getCityQuery(searchVal);
-  return cached(cacheKey('bundle', cityQuery), async () => {
-    const { currentData, label, cityQuery: query } = await fetchCurrentWeather(searchVal);
-    const lat = currentData.coord?.lat;
-    const lon = currentData.coord?.lon;
-    const [forecastData, airData] = await Promise.all([
-      fetchForecast(query),
-      fetchAirPollution(lat, lon)
-    ]);
-    return { currentData, label, cityQuery: query, forecastData, airData };
-  });
+  return cached(cacheKey('bundle', cityQuery), () => fetchWeatherBundleRaw(searchVal));
 }
 
 export async function resolveLocationLabel(searchVal) {
