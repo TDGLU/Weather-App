@@ -18,13 +18,29 @@ const currentCityHumidity = document.getElementById('currentCityHumidity');
 const todaysDate = document.getElementById('todaysDate');
 const cards = document.querySelectorAll('.card');
 
+// Format as Month Day, Year (e.g. June 5, 2026)
+function formatLongDate(date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
 // Set today's date
 function setTodaysDate() {
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2, '0');
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const yyyy = today.getFullYear();
-  todaysDate.textContent = `${mm}/${dd}/${yyyy}`;
+  todaysDate.textContent = formatLongDate(new Date());
+}
+
+// CSS animation class from OpenWeather icon code
+function getWeatherAnimClass(iconCode) {
+  const code = (iconCode || '01d').replace(/@.*$/, '').slice(0, 2);
+  if (code === '11') return 'weather-anim-storm';
+  if (code === '09' || code === '10') return 'weather-anim-rain';
+  if (code === '13') return 'weather-anim-snow';
+  if (code === '50') return 'weather-anim-mist';
+  if (code === '01') return 'weather-anim-sun';
+  return 'weather-anim-cloud';
 }
 
 // Load history from localStorage
@@ -170,10 +186,9 @@ async function getStateFromCoords(lat, lon) {
   }
 }
 
-// Format date from unix ts to M/D/YYYY (no leading zero on month/day to match original style)
+// Format forecast card date from unix timestamp
 function formatCardDate(dt) {
-  const d = new Date(dt * 1000);
-  return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+  return formatLongDate(new Date(dt * 1000));
 }
 
 // Update a single forecast card
@@ -181,6 +196,7 @@ function updateCard(cardEl, entry) {
   if (!entry || !entry.main || !entry.weather || !entry.weather[0]) return;
 
   const dateP = cardEl.querySelector('.card-date');
+  const iconWrap = cardEl.querySelector('.weather-icon-wrap');
   const iconImg = cardEl.querySelector('.card-icon');
   const tempSpan = cardEl.querySelector('.card-temp span');
   const windSpan = cardEl.querySelector('.card-wind span');
@@ -189,8 +205,11 @@ function updateCard(cardEl, entry) {
   if (dateP) dateP.textContent = formatCardDate(entry.dt);
   if (iconImg) {
     const iconCode = entry.weather[0].icon || '01d';
-    iconImg.src = `https://openweathermap.org/img/wn/${iconCode}.png`;
+    iconImg.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
     iconImg.alt = entry.weather[0].description || 'weather icon';
+    if (iconWrap) {
+      iconWrap.className = `weather-icon-wrap ${getWeatherAnimClass(iconCode)}`;
+    }
   }
   if (tempSpan) tempSpan.textContent = Math.round(entry.main.temp);
   if (windSpan) windSpan.textContent = Math.round(entry.wind ? entry.wind.speed : 0);

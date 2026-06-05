@@ -34,11 +34,17 @@
   scroll-behavior: smooth;
 }
 
+html {
+  height: 100%;
+}
+
 body {
-  min-height: 100vh;
+  min-height: 100%;
+  min-height: 100dvh;
   font-family: var(--font-body);
   color: var(--text-deep);
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Floating decorative bubbles */
@@ -112,47 +118,64 @@ body {
   }
 }
 
-/* Dreamy layered background */
+/* Dreamy layered background — full viewport */
 .container {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
-  padding: 1.25rem 1.5rem 2rem;
+  max-width: none;
+  padding: clamp(0.75rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
   background:
     linear-gradient(165deg, rgba(196, 181, 253, 0.35) 0%, rgba(125, 211, 252, 0.25) 40%, rgba(251, 207, 232, 0.3) 100%),
-    url('../imgs/stacked-waves-haikei.svg') center / cover no-repeat fixed;
+    url('../imgs/stacked-waves-haikei.svg') center / cover no-repeat;
+  background-attachment: scroll;
 }
 
 /* Header */
 .title {
+  flex-shrink: 0;
   text-align: center;
-  padding: 0.5rem 0 0.25rem;
+  padding: 0.25rem 0 0.5rem;
+}
+
+.title-banner {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.85rem 2rem 1rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-bubble);
+  box-shadow:
+    0 8px 32px rgba(30, 41, 89, 0.2),
+    0 0 0 1px rgba(124, 58, 237, 0.15);
 }
 
 .title h1 {
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  font-size: clamp(2.2rem, 5vw, 3.25rem);
   font-weight: 700;
   letter-spacing: 0.02em;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 4px 24px rgba(167, 139, 250, 0.25);
+  color: #312e81;
+  -webkit-text-fill-color: #312e81;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.8);
 }
 
 .title-tagline {
   margin-top: 0.35rem;
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--text-soft);
+  color: #5b21b6;
 }
 
 .date {
+  flex-shrink: 0;
   display: flex;
   justify-content: center;
-  margin: 0.5rem 0 1.25rem;
+  margin: 0.35rem 0 0.85rem;
 }
 
 .date h2 {
@@ -171,27 +194,35 @@ body {
 
 /* Layout */
 .content-section {
+  flex: 1;
   display: flex;
   flex-direction: row;
-  gap: 1.5rem;
-  max-width: 1400px;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  width: 100%;
+  max-width: 1600px;
   margin: 0 auto;
-  align-items: flex-start;
+  align-items: stretch;
+  min-height: 0;
+  overflow: visible;
 }
 
 .sidebar {
-  flex: 0 0 320px;
+  flex: 0 0 clamp(260px, 28vw, 320px);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  min-height: 0;
+  overflow: visible;
 }
 
 .main-content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  overflow: visible;
 }
 
 /* Glass bubble panels */
@@ -202,11 +233,11 @@ body {
   border: 1.5px solid var(--glass-border);
   border-radius: var(--radius-bubble);
   box-shadow: var(--glass-shadow);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: visible;
+  transition: box-shadow 0.25s ease;
 }
 
 .panel:hover {
-  transform: translateY(-2px);
   box-shadow: 0 16px 48px rgba(30, 58, 138, 0.22);
 }
 
@@ -282,6 +313,7 @@ body {
 /* History */
 .history-panel {
   padding: 1.25rem 1.25rem 1rem;
+  overflow: visible;
 }
 
 .history-title {
@@ -298,6 +330,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  padding: 0.35rem 0;
+  overflow: visible;
 }
 
 .history-item {
@@ -369,6 +403,8 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  padding: 0.35rem 0;
+  overflow: visible;
 }
 
 .stat-pill {
@@ -416,23 +452,44 @@ body {
 }
 
 /* Forecast */
+.panel-forecast,
+.five-day-forecast {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
 .five-day-forcast-title {
+  flex-shrink: 0;
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 600;
   color: var(--text-deep);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   padding-left: 0.25rem;
+}
+
+/* Padding gives hover lift room so cards are not clipped */
+.cards-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1.35rem 0.5rem 1.35rem;
+  margin: 0 -0.25rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .cards-container {
   display: flex;
   flex-direction: row;
+  align-items: stretch;
   gap: 1rem;
-  padding: 0.25rem 0.25rem 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+  min-height: min-content;
+  overflow: visible;
+  scroll-snap-type: x proximity;
 }
 
 .cards-container::-webkit-scrollbar {
@@ -445,6 +502,7 @@ body {
 }
 
 .card {
+  position: relative;
   flex: 0 0 auto;
   scroll-snap-align: start;
   display: flex;
@@ -465,14 +523,26 @@ body {
 }
 
 .card:hover {
-  transform: translateY(-6px) scale(1.03);
+  transform: translateY(-5px) scale(1.02);
   box-shadow: 0 16px 36px rgba(79, 70, 229, 0.35);
+  z-index: 2;
 }
 
 .card-date {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Animated weather icons */
+.weather-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  flex-shrink: 0;
 }
 
 .card-icon {
@@ -480,6 +550,95 @@ body {
   height: 3.5rem;
   object-fit: contain;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  will-change: transform;
+}
+
+.weather-anim-sun .card-icon,
+.weather-anim-cloud .card-icon {
+  animation: iconFloat 3.2s ease-in-out infinite;
+}
+
+.weather-anim-rain .card-icon {
+  animation: iconRain 2.2s ease-in-out infinite;
+}
+
+.weather-anim-storm .card-icon {
+  animation: iconStorm 1.4s ease-in-out infinite;
+}
+
+.weather-anim-snow .card-icon {
+  animation: iconSnow 3.5s ease-in-out infinite;
+}
+
+.weather-anim-mist .card-icon {
+  animation: iconMist 4s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(4deg);
+  }
+}
+
+@keyframes iconRain {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(6px);
+  }
+  70% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes iconStorm {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px) rotate(-3deg);
+  }
+  75% {
+    transform: translateX(4px) rotate(3deg);
+  }
+}
+
+@keyframes iconSnow {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.06);
+  }
+}
+
+@keyframes iconMist {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-icon,
+  .bubble {
+    animation: none !important;
+  }
+
+  .card:hover,
+  .history-item:hover,
+  .stat-pill:hover,
+  .search-btn:hover:not(:disabled) {
+    transform: none;
+  }
 }
 
 .card p {
@@ -500,21 +659,27 @@ body {
 @media (max-width: 900px) {
   .content-section {
     flex-direction: column;
+    flex: 1 1 auto;
   }
 
   .sidebar {
-    flex: none;
+    flex: 0 0 auto;
     width: 100%;
   }
 
   .main-content {
     width: 100%;
+    flex: 1;
+  }
+
+  .panel-forecast {
+    min-height: 280px;
   }
 }
 
 @media (max-width: 480px) {
-  .container {
-    padding: 1rem;
+  .title-banner {
+    padding: 0.75rem 1.25rem 0.9rem;
   }
 
   .current-weather {
@@ -523,5 +688,9 @@ body {
 
   .stat-pill {
     flex: 1 1 100%;
+  }
+
+  .card {
+    min-width: 8.5rem;
   }
 }
