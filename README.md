@@ -2,13 +2,13 @@
 
 A dreamy, glass-style weather dashboard for searching cities, viewing a 5-day forecast, and comparing multiple locations side by side.
 
-![Weather App screenshot](./assets/imgs/screenshot.png)
-
 ## Live demo
 
 **https://tdglu.github.io/Weather-App/**
 
 Every push to `main` deploys automatically with [GitHub Actions](.github/workflows/deploy.yml). If the site is not live yet, open **Settings → Pages** and set **Build and deployment** to **GitHub Actions**.
+
+![Weather App screenshot](./assets/imgs/screenshot.png)
 
 ## Features
 
