@@ -14,7 +14,7 @@ Every push to `main` runs a production build and deploys with [GitHub Actions](.
 
 - **City search** — current temperature, wind, humidity, and conditions
 - **5-day forecast** — daily icon, weather type (e.g. Clear Sky), temp, wind, and humidity
-- **Search history** — recent cities saved in your browser (up to 6)
+- **Search history** — unlimited recent cities saved in your browser (scrollable list)
 - **City comparison** — add many cities side by side with current weather and mini 5-day forecasts (up to 10)
 - **Air quality** — iOS-style slider with PM2.5 and quality label
 - **Light / dark mode** — toggle in the top-right; preference is saved locally

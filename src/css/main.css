@@ -491,11 +491,16 @@ body {
 
 /* History */
 .history-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 1.25rem 1.25rem 1rem;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .history-title {
+  flex-shrink: 0;
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 600;
@@ -509,8 +514,31 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  padding: 0.35rem 0;
-  overflow: visible;
+  flex: 1;
+  min-height: 0;
+  max-height: min(50vh, 28rem);
+  margin: 0;
+  padding: 0.35rem 0.2rem 0.35rem 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.45) transparent;
+}
+
+.history::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 999px;
+}
+
+.history::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .history-item {
@@ -581,6 +609,7 @@ body {
 }
 
 .clearHistoryContainer {
+  flex-shrink: 0;
   display: flex;
   justify-content: center;
   margin-top: 1rem;

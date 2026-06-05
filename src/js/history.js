@@ -1,4 +1,4 @@
-import { HISTORY_KEY, MAX_HISTORY } from './config.js';
+import { HISTORY_KEY } from './config.js';
 import { isCityInCompare } from './compare.js';
 import { getDom } from './dom.js';
 import { getHistoryCityKey, labelNeedsUpgrade } from './format.js';
@@ -62,7 +62,6 @@ export function addToHistory(cityLabel) {
   let history = loadHistory();
   history = history.filter((h) => getHistoryCityKey(h) !== cityKey);
   history.unshift(cityLabel);
-  if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
   saveHistory(history);
   renderHistory();
 }
