@@ -4,9 +4,11 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "icons": "node scripts/generate-icons.mjs",
     "dev": "node scripts/build.mjs && python -m http.server 8765"
   },
   "devDependencies": {
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "sharp": "^0.34.5"
   }
 }

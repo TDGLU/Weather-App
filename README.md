@@ -85,13 +85,15 @@ Weather-App/
 
 | File | Description |
 |------|-------------|
-| `assets/images/icon.png` | App icon (512×512 PNG, transparent background) |
+| `assets/images/icon.png` | Default app icon (512×512 PNG, transparent) |
+| `assets/images/icons/icon-*.png` | Favicon / PWA sizes (16–1024) |
+| `assets/images/icon-source.jpg` | Master artwork for regeneration |
 | `assets/images/screenshot.png` | README preview |
 
-Regenerate the icon:
+Regenerate PNG icons from the master artwork:
 
 ```bash
-node scripts/render-icon.mjs
+npm run icons
 ```
 
 Regenerate the README screenshot:
