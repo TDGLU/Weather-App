@@ -726,7 +726,9 @@ body {
   flex-shrink: 0;
 }
 
-.card-icon {
+.card-icon,
+.compare-icon,
+.compare-day-icon {
   width: 3.5rem;
   height: 3.5rem;
   object-fit: contain;
@@ -734,30 +736,43 @@ body {
   will-change: transform;
 }
 
+/* Weather icons keep true colors in app dark mode (not inverted like UI chrome) */
+[data-theme='dark'] .card-icon,
+[data-theme='dark'] .compare-icon,
+[data-theme='dark'] .compare-day-icon {
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+}
+
 .weather-anim-sun .card-icon,
 .weather-anim-cloud .card-icon,
 .weather-anim-sun .compare-icon,
-.weather-anim-cloud .compare-icon {
+.weather-anim-cloud .compare-icon,
+.weather-anim-sun .compare-day-icon,
+.weather-anim-cloud .compare-day-icon {
   animation: iconFloat 3.2s ease-in-out infinite;
 }
 
 .weather-anim-rain .card-icon,
-.weather-anim-rain .compare-icon {
+.weather-anim-rain .compare-icon,
+.weather-anim-rain .compare-day-icon {
   animation: iconRain 2.2s ease-in-out infinite;
 }
 
 .weather-anim-storm .card-icon,
-.weather-anim-storm .compare-icon {
+.weather-anim-storm .compare-icon,
+.weather-anim-storm .compare-day-icon {
   animation: iconStorm 1.4s ease-in-out infinite;
 }
 
 .weather-anim-snow .card-icon,
-.weather-anim-snow .compare-icon {
+.weather-anim-snow .compare-icon,
+.weather-anim-snow .compare-day-icon {
   animation: iconSnow 3.5s ease-in-out infinite;
 }
 
 .weather-anim-mist .card-icon,
-.weather-anim-mist .compare-icon {
+.weather-anim-mist .compare-icon,
+.weather-anim-mist .compare-day-icon {
   animation: iconMist 4s ease-in-out infinite;
 }
 
@@ -982,9 +997,9 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.45rem;
-  min-width: 11.5rem;
-  max-width: 14rem;
-  padding: 1.25rem 1rem 1.1rem;
+  min-width: 17rem;
+  max-width: 20rem;
+  padding: 1.25rem 0.85rem 1.1rem;
   text-align: center;
   color: var(--text-on-glass);
   background: var(--card-gradient);
@@ -1084,6 +1099,69 @@ body {
   font-size: 0.75rem;
 }
 
+.compare-forecast {
+  width: 100%;
+  margin-top: 0.65rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.compare-forecast-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.55rem;
+  color: var(--text-on-glass);
+  opacity: 0.95;
+}
+
+.compare-forecast-days {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.compare-day {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0.15rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.compare-day-date {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: var(--text-on-glass);
+  opacity: 0.9;
+}
+
+.compare-day-icon-wrap {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.compare-day-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.compare-day-temp {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-on-glass);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .content-section {
@@ -1137,6 +1215,11 @@ body {
   }
 
   .compare-card {
-    min-width: 10rem;
+    min-width: 15rem;
+    max-width: 18rem;
+  }
+
+  .compare-day-date {
+    font-size: 0.58rem;
   }
 }

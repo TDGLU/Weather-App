@@ -74,15 +74,64 @@ function setTodaysDate() {
   todaysDate.textContent = formatLongDate(new Date());
 }
 
+// Use day icon variant so clear sky shows sun (not moon) in app dark theme / at night
+function getDisplayIconCode(iconCode) {
+  const code = (iconCode || '01d').replace(/@.*$/, '');
+  if (code.length >= 3 && code.endsWith('n')) {
+    return `${code.slice(0, -1)}d`;
+  }
+  return code;
+}
+
 // CSS animation class from OpenWeather icon code
 function getWeatherAnimClass(iconCode) {
-  const code = (iconCode || '01d').replace(/@.*$/, '').slice(0, 2);
+  const code = getDisplayIconCode(iconCode).slice(0, 2);
   if (code === '11') return 'weather-anim-storm';
   if (code === '09' || code === '10') return 'weather-anim-rain';
   if (code === '13') return 'weather-anim-snow';
   if (code === '50') return 'weather-anim-mist';
   if (code === '01') return 'weather-anim-sun';
   return 'weather-anim-cloud';
+}
+
+function setWeatherIcon(iconWrap, iconImg, rawIconCode, description) {
+  if (!iconImg) return;
+  const iconCode = getDisplayIconCode(rawIconCode);
+  iconImg.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+  iconImg.alt = description || 'weather icon';
+  if (iconWrap) {
+    iconWrap.className = `weather-icon-wrap ${getWeatherAnimClass(iconCode)}`;
+  }
+}
+
+function formatShortDate(date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+function pickFiveForecastDays(forecastData) {
+  if (!forecastData || !forecastData.list || forecastData.list.length === 0) return [];
+
+  const days = [];
+  const seen = new Set();
+
+  for (const entry of forecastData.list) {
+    const d = new Date(entry.dt * 1000);
+    const dayKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    if (!seen.has(dayKey)) {
+      seen.add(dayKey);
+      days.push(entry);
+      if (days.length >= 5) break;
+    }
+  }
+
+  while (days.length < 5 && days.length > 0) {
+    days.push(days[days.length - 1]);
+  }
+
+  return days;
 }
 
 // Load history from localStorage
@@ -245,13 +294,8 @@ function updateCard(cardEl, entry) {
   const humSpan = cardEl.querySelector('.card-humidity span');
 
   if (dateP) dateP.textContent = formatCardDate(entry.dt);
-  if (iconImg) {
-    const iconCode = entry.weather[0].icon || '01d';
-    iconImg.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-    iconImg.alt = entry.weather[0].description || 'weather icon';
-    if (iconWrap) {
-      iconWrap.className = `weather-icon-wrap ${getWeatherAnimClass(iconCode)}`;
-    }
+  if (iconImg && entry.weather[0]) {
+    setWeatherIcon(iconWrap, iconImg, entry.weather[0].icon, entry.weather[0].description);
   }
   if (tempSpan) tempSpan.textContent = Math.round(entry.main.temp);
   if (windSpan) windSpan.textContent = Math.round(entry.wind ? entry.wind.speed : 0);
@@ -260,26 +304,7 @@ function updateCard(cardEl, entry) {
 
 // Update all 5 forecast cards from the forecast list (pick one per day, using local calendar days)
 function updateFiveDayForecast(forecastData) {
-  if (!forecastData || !forecastData.list || forecastData.list.length === 0) return;
-
-  const days = [];
-  const seen = new Set();
-
-  for (const entry of forecastData.list) {
-    const d = new Date(entry.dt * 1000);
-    const dayKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    if (!seen.has(dayKey)) {
-      seen.add(dayKey);
-      days.push(entry);
-      if (days.length >= 5) break;
-    }
-  }
-
-  // If fewer than 5, pad by repeating last (rare)
-  while (days.length < 5 && days.length > 0) {
-    days.push(days[days.length - 1]);
-  }
-
+  const days = pickFiveForecastDays(forecastData);
   cards.forEach((card, i) => {
     if (days[i]) {
       updateCard(card, days[i]);
@@ -302,6 +327,18 @@ async function fetchCurrentWeather(searchVal) {
   const currentData = await res.json();
   const label = await buildLabelFromWeatherData(currentData, cityQuery);
   return { currentData, label, cityQuery };
+}
+
+async function fetchForecast(cityQuery) {
+  const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(cityQuery)}&appid=${APIKey}&units=imperial`;
+  const forecastRes = await fetch(forecastUrl);
+  return forecastRes.ok ? forecastRes.json() : { list: [] };
+}
+
+async function fetchWeatherBundle(searchVal) {
+  const { currentData, label, cityQuery } = await fetchCurrentWeather(searchVal);
+  const forecastData = await fetchForecast(cityQuery);
+  return { currentData, label, cityQuery, forecastData };
 }
 
 // --- City comparison ---
@@ -346,6 +383,18 @@ function removeFromCompareList(searchVal) {
   saveCompare(list);
 }
 
+function buildCompareForecastDaysMarkup() {
+  return Array.from({ length: 5 }, () => `
+    <div class="compare-day">
+      <span class="compare-day-date">--</span>
+      <span class="weather-icon-wrap weather-anim-cloud compare-day-icon-wrap">
+        <img src="./assets/imgs/icon.png" alt="" class="compare-day-icon card-icon">
+      </span>
+      <span class="compare-day-temp">--</span>
+    </div>
+  `).join('');
+}
+
 function buildCompareCardShell(cityLabel) {
   const card = document.createElement('article');
   card.className = 'compare-card is-loading';
@@ -354,7 +403,7 @@ function buildCompareCardShell(cityLabel) {
   card.innerHTML = `
     <button type="button" class="compare-remove" aria-label="Remove from comparison">&times;</button>
     <h4 class="compare-city">${cityLabel}</h4>
-    <span class="weather-icon-wrap weather-anim-cloud">
+    <span class="weather-icon-wrap weather-anim-cloud compare-current-icon-wrap">
       <img src="./assets/imgs/icon.png" alt="" class="compare-icon card-icon">
     </span>
     <p class="compare-desc">Loading...</p>
@@ -372,6 +421,10 @@ function buildCompareCardShell(cityLabel) {
         <span class="compare-stat-value"><span class="compare-humidity">--</span><span class="stat-unit">%</span></span>
       </div>
     </div>
+    <div class="compare-forecast">
+      <p class="compare-forecast-label">5-Day Forecast</p>
+      <div class="compare-forecast-days">${buildCompareForecastDaysMarkup()}</div>
+    </div>
   `;
 
   card.querySelector('.compare-remove').addEventListener('click', () => {
@@ -382,11 +435,28 @@ function buildCompareCardShell(cityLabel) {
   return card;
 }
 
-function updateCompareCard(cardEl, label, currentData, errorMsg) {
+function renderCompareForecast(cardEl, forecastDays) {
+  const dayEls = cardEl.querySelectorAll('.compare-day');
+  dayEls.forEach((dayEl, i) => {
+    const entry = forecastDays[i];
+    if (!entry || !entry.weather || !entry.weather[0]) return;
+
+    const dateSpan = dayEl.querySelector('.compare-day-date');
+    const iconWrap = dayEl.querySelector('.compare-day-icon-wrap');
+    const iconImg = dayEl.querySelector('.compare-day-icon');
+    const tempSpan = dayEl.querySelector('.compare-day-temp');
+
+    if (dateSpan) dateSpan.textContent = formatShortDate(new Date(entry.dt * 1000));
+    if (tempSpan) tempSpan.textContent = `${Math.round(entry.main.temp)}°`;
+    setWeatherIcon(iconWrap, iconImg, entry.weather[0].icon, entry.weather[0].description);
+  });
+}
+
+function updateCompareCard(cardEl, label, currentData, forecastDays, errorMsg) {
   cardEl.classList.remove('is-loading');
 
   const cityEl = cardEl.querySelector('.compare-city');
-  const iconWrap = cardEl.querySelector('.weather-icon-wrap');
+  const iconWrap = cardEl.querySelector('.compare-current-icon-wrap') || cardEl.querySelector('.weather-icon-wrap:not(.compare-day-icon-wrap)');
   const iconImg = cardEl.querySelector('.compare-icon');
   const descEl = cardEl.querySelector('.compare-desc');
   const tempEl = cardEl.querySelector('.compare-temp');
@@ -412,19 +482,17 @@ function updateCompareCard(cardEl, label, currentData, errorMsg) {
   if (windEl) windEl.textContent = Math.round(currentData.wind ? currentData.wind.speed : 0);
   if (humEl) humEl.textContent = currentData.main.humidity;
 
-  if (iconImg && weather) {
-    const iconCode = weather.icon || '01d';
-    iconImg.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-    iconImg.alt = weather.description || 'weather icon';
-    if (iconWrap) {
-      iconWrap.className = `weather-icon-wrap ${getWeatherAnimClass(iconCode)}`;
-    }
+  if (weather) {
+    setWeatherIcon(iconWrap, iconImg, weather.icon, weather.description);
   }
+
+  renderCompareForecast(cardEl, forecastDays || []);
 }
 
 async function loadCompareCardData(cardEl, cityLabel) {
   try {
-    const { currentData, label } = await fetchCurrentWeather(cityLabel);
+    const { currentData, label, forecastData } = await fetchWeatherBundle(cityLabel);
+    const forecastDays = pickFiveForecastDays(forecastData);
     const resolvedKey = getHistoryCityKey(label);
     cardEl.dataset.cityKey = resolvedKey;
 
@@ -433,9 +501,9 @@ async function loadCompareCardData(cardEl, cityLabel) {
     list = list.map((c) => (getHistoryCityKey(c) === oldKey ? label : c));
     saveCompare(list);
 
-    updateCompareCard(cardEl, label, currentData);
+    updateCompareCard(cardEl, label, currentData, forecastDays);
   } catch (err) {
-    updateCompareCard(cardEl, cityLabel, null, err.message || 'Could not load');
+    updateCompareCard(cardEl, cityLabel, null, [], err.message || 'Could not load');
   }
 }
 
@@ -529,15 +597,8 @@ async function doSearch(searchVal) {
   searchBtn.textContent = 'Loading...';
   searchBtn.disabled = true;
 
-  const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(cityQuery)}&appid=${APIKey}&units=imperial`;
-
   try {
-    const [{ currentData, label }, forecastRes] = await Promise.all([
-      fetchCurrentWeather(searchVal),
-      fetch(forecastUrl)
-    ]);
-
-    const forecastData = forecastRes.ok ? await forecastRes.json() : { list: [] };
+    const { currentData, label, forecastData } = await fetchWeatherBundle(searchVal);
 
     // Update CURRENT weather
     searchedCity.textContent = label;
