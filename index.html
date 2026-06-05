@@ -9,101 +9,110 @@
   <title>Weather App</title>
 </head>
 <body>
+  <div class="sky-bubbles" aria-hidden="true">
+    <span class="bubble bubble-1"></span>
+    <span class="bubble bubble-2"></span>
+    <span class="bubble bubble-3"></span>
+    <span class="bubble bubble-4"></span>
+    <span class="bubble bubble-5"></span>
+  </div>
+
   <div class="container">
     <header class="title">
       <h1>Weather App</h1>
+      <p class="title-tagline">Your cozy little sky snapshot</p>
     </header>
+
     <div class="date">
       <h2 id="todaysDate"></h2>
     </div>
+
     <div class="content-section">
-      <!-- Aside Section  -->
-      <aside>
-        <!-- Search Section  -->
-        <div class="search-section">
+      <aside class="sidebar">
+        <div class="panel search-section">
           <h3 class="search-for-a-city">Search for a City</h3>
           <input class="city-search" type="text" placeholder="Perris, CA, US" id="searchText">
           <button class="search-btn" id="searchBtn">Search</button>
         </div>
-        <!-- History Section  -->
-        <p class="history-title">History</p>
-        <ul class="history" id="history">
-          <li class="history-item">Perris, CA</li>
-          <li class="history-item">Los Angeles, CA</li>
-          <li class="history-item">Bakersfield, CA</li>
-          <li class="history-item">Los Santos, CA</li>
-          <li class="history-item">Fontana, CA</li>
-        </ul>
-        <div class="clearHistoryContainer">
-         <button id="clearHistory">Clear</button>
+
+        <div class="panel history-panel">
+          <p class="history-title">Recent Adventures</p>
+          <ul class="history" id="history">
+            <li class="history-item">Perris, CA</li>
+            <li class="history-item">Los Angeles, CA</li>
+            <li class="history-item">Bakersfield, CA</li>
+            <li class="history-item">Los Santos, CA</li>
+            <li class="history-item">Fontana, CA</li>
+          </ul>
+          <div class="clearHistoryContainer">
+            <button id="clearHistory" type="button">Clear history</button>
+          </div>
         </div>
       </aside>
 
-      <!-- Main Section  -->
-      <main>
-        <section>
-          <!-- Current City Information -->
+      <main class="main-content">
+        <section class="panel current-weather">
           <h2 class="searched-city" id="searchedCity">Perris</h2>
           <div class="city-details">
-            <p class="city-temp">Temperature: <span id="currentCityTemp">54</span></p>
-            <p class="city-wind">Wind: <span id="currentCityWind">345</span></p>
-            <p class="city-humidity">Humidity: <span id="currentCityHumidity">31</span></p>
+            <div class="stat-pill">
+              <span class="stat-label">Temperature</span>
+              <span class="stat-value"><span id="currentCityTemp">54</span><span class="stat-unit">°F</span></span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">Wind</span>
+              <span class="stat-value"><span id="currentCityWind">345</span><span class="stat-unit"> mph</span></span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">Humidity</span>
+              <span class="stat-value"><span id="currentCityHumidity">31</span><span class="stat-unit">%</span></span>
+            </div>
           </div>
         </section>
-        <div class="five-day-forecast">
-          <h3 class="five-day-forcast-title">5-Day Forecast:</h3>
-          <div class="cards-container">
 
-            <!-- Card  -->
+        <div class="five-day-forecast">
+          <h3 class="five-day-forcast-title">5-Day Forecast</h3>
+          <div class="cards-container">
             <div class="card">
               <p class="card-date" id="cardDate">10/29/2022</p>
               <img src="./assets/imgs/icon.png" alt="" class="card-icon">
-              <p class="card-temp">Temperature: <span>54</span></p>
-              <p class="card-wind">Wind: <span>345</span></p>
-              <p class="card-humidity">Humidity: <span>31</span></p>
+              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
+              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
+              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
             </div>
-
-            <!-- Card  -->
             <div class="card">
               <p class="card-date">10/29/2022</p>
               <img src="./assets/imgs/icon.png" alt="" class="card-icon">
-              <p class="card-temp">Temperature: <span>54</span></p>
-              <p class="card-wind">Wind: <span>345</span></p>
-              <p class="card-humidity">Humidity: <span>31</span></p>
+              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
+              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
+              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
             </div>
-
-            <!-- Card  -->
             <div class="card">
               <p class="card-date">10/29/2022</p>
               <img src="./assets/imgs/icon.png" alt="" class="card-icon">
-              <p class="card-temp">Temperature: <span>54</span></p>
-              <p class="card-wind">Wind: <span>345</span></p>
-              <p class="card-humidity">Humidity: <span>31</span></p>
+              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
+              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
+              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
             </div>
-
-            <!-- Card  -->
             <div class="card">
               <p class="card-date">10/29/2022</p>
               <img src="./assets/imgs/icon.png" alt="" class="card-icon">
-              <p class="card-temp">Temperature: <span>54</span></p>
-              <p class="card-wind">Wind: <span>345</span></p>
-              <p class="card-humidity">Humidity: <span>31</span></p>
+              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
+              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
+              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
             </div>
-
-            <!-- Card  -->
             <div class="card">
               <p class="card-date">10/29/2022</p>
               <img src="./assets/imgs/icon.png" alt="" class="card-icon">
-              <p class="card-temp">Temperature: <span>54</span></p>
-              <p class="card-wind">Wind: <span>345</span></p>
-              <p class="card-humidity">Humidity: <span>31</span></p>
+              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
+              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
+              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
             </div>
           </div>
         </div>
       </main>
     </div>
   </div>
+
+  <script src="./assets/js/script.js"></script>
 </body>
-<!-- Linked Javascript -->
-<script src="./assets/js/script.js"></script>
 </html>
