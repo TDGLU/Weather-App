@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outPath = path.join(__dirname, '..', 'assets', 'imgs', 'screenshot.png');
+const outPath = path.join(__dirname, '..', 'assets', 'images', 'screenshot.png');
 const baseUrl = process.env.APP_URL || 'http://127.0.0.1:8765/';
 
 const browser = await chromium.launch();

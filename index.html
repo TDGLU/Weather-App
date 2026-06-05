@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./assets/css/style.css">
-  <link rel="icon" type="image/png" href="./assets/imgs/icon.png" />
-  <link rel="apple-touch-icon" href="./assets/imgs/icon.png" />
-  <script src="./assets/js/theme-init.js"></script>
+  <meta name="description" content="Search cities, view 5-day forecasts, compare weather, and check air quality.">
+  <meta name="theme-color" content="#4f46e5">
   <title>Weather App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://api.openweathermap.org">
+  <link rel="preconnect" href="https://openweathermap.org">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Fredoka:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="./assets/css/app.min.css">
+  <link rel="icon" type="image/png" href="./assets/images/icon.png">
+  <link rel="apple-touch-icon" href="./assets/images/icon.png">
+  <script src="./assets/js/theme-init.js"></script>
 </head>
 <body>
   <div class="sky-bubbles" aria-hidden="true">
@@ -40,8 +46,8 @@
       <aside class="sidebar">
         <div class="panel search-section">
           <h3 class="search-for-a-city">Search for a City</h3>
-          <input class="city-search" type="text" placeholder="City name" id="searchText">
-          <button class="search-btn" id="searchBtn">Search</button>
+          <input class="city-search" type="text" placeholder="City name" id="searchText" autocomplete="off" spellcheck="false">
+          <button class="search-btn" id="searchBtn" type="button">Search</button>
         </div>
 
         <div class="panel history-panel">
@@ -58,7 +64,7 @@
           <h2 class="searched-city" id="searchedCity">Search for a city</h2>
           <div class="current-weather-hero">
             <span class="weather-icon-wrap weather-anim-cloud current-hero-icon-wrap" id="currentWeatherIconWrap">
-              <img src="./assets/imgs/icon.png" alt="" class="current-hero-icon card-icon" id="currentWeatherIcon">
+              <img src="./assets/images/icon.png" alt="" class="current-hero-icon card-icon" id="currentWeatherIcon" width="64" height="64" decoding="async">
             </span>
             <p class="current-weather-desc weather-type-label" id="currentWeatherDesc">—</p>
           </div>
@@ -127,48 +133,7 @@
         <div class="five-day-forecast panel-forecast">
           <h3 class="five-day-forcast-title">5-Day Forecast</h3>
           <div class="cards-scroll">
-            <div class="cards-container">
-            <div class="card">
-              <p class="card-date" id="cardDate">October 29, 2022</p>
-              <span class="weather-icon-wrap weather-anim-cloud"><img src="./assets/imgs/icon.png" alt="" class="card-icon"></span>
-              <p class="card-weather-desc weather-type-label">Clear Sky</p>
-              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
-              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
-              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
-            </div>
-            <div class="card">
-              <p class="card-date">October 29, 2022</p>
-              <span class="weather-icon-wrap weather-anim-cloud"><img src="./assets/imgs/icon.png" alt="" class="card-icon"></span>
-              <p class="card-weather-desc weather-type-label">Clear Sky</p>
-              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
-              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
-              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
-            </div>
-            <div class="card">
-              <p class="card-date">October 29, 2022</p>
-              <span class="weather-icon-wrap weather-anim-cloud"><img src="./assets/imgs/icon.png" alt="" class="card-icon"></span>
-              <p class="card-weather-desc weather-type-label">Clear Sky</p>
-              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
-              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
-              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
-            </div>
-            <div class="card">
-              <p class="card-date">October 29, 2022</p>
-              <span class="weather-icon-wrap weather-anim-cloud"><img src="./assets/imgs/icon.png" alt="" class="card-icon"></span>
-              <p class="card-weather-desc weather-type-label">Clear Sky</p>
-              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
-              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
-              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
-            </div>
-            <div class="card">
-              <p class="card-date">October 29, 2022</p>
-              <span class="weather-icon-wrap weather-anim-cloud"><img src="./assets/imgs/icon.png" alt="" class="card-icon"></span>
-              <p class="card-weather-desc weather-type-label">Clear Sky</p>
-              <p class="card-temp">Temp: <span>54</span><span class="stat-unit">°F</span></p>
-              <p class="card-wind">Wind: <span>345</span><span class="stat-unit"> mph</span></p>
-              <p class="card-humidity">Humidity: <span>31</span><span class="stat-unit">%</span></p>
-            </div>
-            </div>
+            <div class="cards-container"></div>
           </div>
         </div>
       </main>
@@ -183,7 +148,7 @@
         <button type="button" class="compare-add-current" id="compareAddCurrent">+ Add current city</button>
       </div>
       <div class="compare-add-row">
-        <input class="city-search compare-search" type="text" placeholder="Add another city..." id="compareInput">
+        <input class="city-search compare-search" type="text" placeholder="Add another city..." id="compareInput" autocomplete="off" spellcheck="false">
         <button type="button" class="search-btn compare-add-btn" id="compareAddBtn">Add</button>
         <button type="button" class="compare-clear-btn" id="compareClearBtn">Clear all</button>
       </div>
@@ -195,6 +160,6 @@
     </section>
   </div>
 
-  <script src="./assets/js/script.js"></script>
+  <script src="./assets/js/app.min.js" defer></script>
 </body>
 </html>
