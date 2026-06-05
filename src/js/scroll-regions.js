@@ -1,6 +1,8 @@
 const SCROLL_REGION_SELECTOR = '.scroll-region';
-const STEP_X = 140;
+const STEP_X = 280;
 const STEP_Y = 56;
+/** Wheel delta multiplier for horizontal strips (feels sluggish at 1:1). */
+const WHEEL_HORIZONTAL_SPEED = 3;
 
 let hoveredScrollRegion = null;
 
@@ -86,7 +88,8 @@ function onWheel(e) {
   let handled = false;
 
   if (axis === 'x' || axis === 'both') {
-    const horizontalDelta = Math.abs(deltaY) >= Math.abs(deltaX) ? deltaY : deltaX;
+    const raw = Math.abs(deltaY) >= Math.abs(deltaX) ? deltaY : deltaX;
+    const horizontalDelta = raw * WHEEL_HORIZONTAL_SPEED;
     if (horizontalDelta !== 0 && canScrollFurther(region, 'x', horizontalDelta)) {
       e.preventDefault();
       region.scrollLeft += horizontalDelta;
