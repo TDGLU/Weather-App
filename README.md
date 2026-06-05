@@ -48,17 +48,27 @@ Weather-App/
 └── .github/workflows/deploy.yml
 ```
 
-## Update the README screenshot
+## Assets
+
+| File | Description |
+|------|-------------|
+| `assets/imgs/icon.png` | App icon (512×512 PNG, transparent background) |
+| `assets/imgs/screenshot.png` | README preview |
+
+Regenerate the icon:
+
+```bash
+node scripts/render-icon.mjs
+```
+
+Regenerate the README screenshot:
 
 ```bash
 npm install playwright@1.49.1 --no-save
 npx playwright install chromium
 python -m http.server 8765
-# In another terminal:
 node scripts/capture-screenshot.mjs
 ```
-
-Writes `assets/imgs/screenshot.png`.
 
 ## Tech
 
