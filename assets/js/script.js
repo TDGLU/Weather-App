@@ -111,6 +111,15 @@ function formatShortDate(date) {
   });
 }
 
+// "clear sky" -> "Clear Sky"
+function formatWeatherDescription(description) {
+  if (!description) return '';
+  return description
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 function pickFiveForecastDays(forecastData) {
   if (!forecastData || !forecastData.list || forecastData.list.length === 0) return [];
 
@@ -287,6 +296,7 @@ function updateCard(cardEl, entry) {
   if (!entry || !entry.main || !entry.weather || !entry.weather[0]) return;
 
   const dateP = cardEl.querySelector('.card-date');
+  const weatherDescP = cardEl.querySelector('.card-weather-desc');
   const iconWrap = cardEl.querySelector('.weather-icon-wrap');
   const iconImg = cardEl.querySelector('.card-icon');
   const tempSpan = cardEl.querySelector('.card-temp span');
@@ -294,6 +304,9 @@ function updateCard(cardEl, entry) {
   const humSpan = cardEl.querySelector('.card-humidity span');
 
   if (dateP) dateP.textContent = formatCardDate(entry.dt);
+  if (weatherDescP && entry.weather[0]) {
+    weatherDescP.textContent = formatWeatherDescription(entry.weather[0].description);
+  }
   if (iconImg && entry.weather[0]) {
     setWeatherIcon(iconWrap, iconImg, entry.weather[0].icon, entry.weather[0].description);
   }
@@ -390,6 +403,7 @@ function buildCompareForecastDaysMarkup() {
       <span class="weather-icon-wrap weather-anim-cloud compare-day-icon-wrap">
         <img src="./assets/imgs/icon.png" alt="" class="compare-day-icon card-icon">
       </span>
+      <span class="compare-day-desc weather-type-label">--</span>
       <span class="compare-day-temp">--</span>
     </div>
   `).join('');
@@ -444,9 +458,11 @@ function renderCompareForecast(cardEl, forecastDays) {
     const dateSpan = dayEl.querySelector('.compare-day-date');
     const iconWrap = dayEl.querySelector('.compare-day-icon-wrap');
     const iconImg = dayEl.querySelector('.compare-day-icon');
+    const descSpan = dayEl.querySelector('.compare-day-desc');
     const tempSpan = dayEl.querySelector('.compare-day-temp');
 
     if (dateSpan) dateSpan.textContent = formatShortDate(new Date(entry.dt * 1000));
+    if (descSpan) descSpan.textContent = formatWeatherDescription(entry.weather[0].description);
     if (tempSpan) tempSpan.textContent = `${Math.round(entry.main.temp)}°`;
     setWeatherIcon(iconWrap, iconImg, entry.weather[0].icon, entry.weather[0].description);
   });
@@ -477,7 +493,7 @@ function updateCompareCard(cardEl, label, currentData, forecastDays, errorMsg) {
   if (cityEl) cityEl.textContent = label;
 
   const weather = currentData.weather && currentData.weather[0];
-  if (descEl) descEl.textContent = weather ? weather.description : '';
+  if (descEl) descEl.textContent = weather ? formatWeatherDescription(weather.description) : '';
   if (tempEl) tempEl.textContent = Math.round(currentData.main.temp);
   if (windEl) windEl.textContent = Math.round(currentData.wind ? currentData.wind.speed : 0);
   if (humEl) humEl.textContent = currentData.main.humidity;

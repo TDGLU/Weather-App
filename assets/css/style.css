@@ -690,8 +690,8 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  min-width: 9.5rem;
-  padding: 1.35rem 1rem;
+  min-width: 10.5rem;
+  padding: 1.35rem 0.85rem;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--text-on-glass);
@@ -714,6 +714,20 @@ body {
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.25;
+}
+
+.weather-type-label {
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.card-weather-desc {
+  font-size: 0.82rem;
+  color: var(--text-on-glass);
+  opacity: 0.95;
+  min-height: 2.5em;
+  padding: 0 0.25rem;
 }
 
 /* Animated weather icons */
@@ -1055,10 +1069,9 @@ body {
 }
 
 .compare-desc {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: capitalize;
-  opacity: 0.9;
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.95;
   min-height: 1.2em;
 }
 
@@ -1153,6 +1166,21 @@ body {
 .compare-day-icon {
   width: 2rem;
   height: 2rem;
+}
+
+.compare-day-desc {
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--text-on-glass);
+  opacity: 0.92;
+  min-height: 2.4em;
+  padding: 0 0.1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .compare-day-temp {
