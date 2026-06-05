@@ -1,3 +1,10 @@
 mcps/
 .DS_Store
 Thumbs.db
+
+# Local user data must never be committed
+.env
+.env.*
+user-data/
+*.local.json
+local-storage-export.*

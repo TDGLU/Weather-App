@@ -1,4 +1,7 @@
 // Weather App - Functional Search + 5-Day Forecast
+//
+// User data (search history, comparison cities, theme) lives only in this
+// browser's localStorage. Nothing personal is stored in or read from the Git repo.
 
 const APIKey = '7b23df2e93e0f4913efaf4a0404c91c0';
 const HISTORY_KEY = 'weatherAppHistory';
@@ -679,21 +682,19 @@ async function init() {
   setTodaysDate();
   initCompare();
 
-  // Seed some example history on very first run (like original static list)
   let history = loadHistory();
-  if (history.length === 0) {
-    const seeds = ['Perris, US', 'Los Angeles, US', 'Bakersfield, US', 'Fontana, US'];
-    saveHistory(seeds);
-    history = seeds;
+  if (history.length > 0) {
+    history = await upgradeHistoryLabels();
   }
-
-  // Upgrade legacy "City, US" entries to "City, State, Country"
-  history = await upgradeHistoryLabels();
   renderHistory();
 
-  const defaultCity = history[0] || 'Perris, US';
-  searchText.value = defaultCity;
-  doSearch(defaultCity);
+  if (history.length > 0) {
+    searchText.value = history[0];
+    doSearch(history[0]);
+  } else {
+    searchText.value = '';
+    searchedCity.textContent = 'Search for a city';
+  }
 }
 
 init();
