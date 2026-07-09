@@ -282,6 +282,11 @@ body {
   border: 0 !important;
 }
 
+/* Beat component display rules so only one panel state is visible */
+[hidden] {
+  display: none !important;
+}
+
 body.prefs-motion-reduced .bubble,
 body.prefs-motion-reduced .panel::before,
 body.prefs-motion-reduced .card::before,
@@ -2602,6 +2607,40 @@ input[type='range'].glass-range:focus-visible::-webkit-slider-thumb {
 
 /* --- Empty / loading / error states --- */
 
+/*
+ * data-state is the source of truth. Component rules like `.state-block { display: flex }`
+ * can otherwise override the HTML `hidden` attribute and show empty + error together.
+ */
+.current-weather #weatherEmptyState,
+.current-weather #weatherErrorState {
+  display: none !important;
+}
+
+.current-weather[data-state='empty'] #weatherEmptyState {
+  display: flex !important;
+}
+
+.current-weather[data-state='error'] #weatherErrorState {
+  display: flex !important;
+}
+
+.current-weather[data-state='empty'] #currentWeatherHero,
+.current-weather[data-state='empty'] #cityDetails,
+.current-weather[data-state='error'] #currentWeatherHero,
+.current-weather[data-state='error'] #cityDetails {
+  display: none !important;
+}
+
+.current-weather[data-state='loading'] #currentWeatherHero,
+.current-weather[data-state='ready'] #currentWeatherHero {
+  display: flex !important;
+}
+
+.current-weather[data-state='loading'] #cityDetails,
+.current-weather[data-state='ready'] #cityDetails {
+  display: grid !important;
+}
+
 .state-block {
   display: flex;
   flex-direction: column;
@@ -2615,6 +2654,10 @@ input[type='range'].glass-range:focus-visible::-webkit-slider-thumb {
   border: 1.5px dashed var(--glass-border);
   background: rgba(255, 255, 255, 0.08);
   box-shadow: var(--glass-inset);
+}
+
+.state-block[hidden] {
+  display: none !important;
 }
 
 .state-block__icon {

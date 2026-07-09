@@ -30,38 +30,48 @@ export function setWeatherPanelState(state, message = '') {
   const panel = dom.currentWeatherPanel;
   if (!panel) return;
 
-  panel.dataset.state = state;
-  panel.classList.toggle('is-empty', state === 'empty');
-  panel.classList.toggle('is-loading', state === 'loading');
-  panel.classList.toggle('is-error', state === 'error');
-  panel.classList.toggle('is-ready', state === 'ready');
+  const next = state === 'loading' || state === 'ready' || state === 'error' ? state : 'empty';
 
-  const showDetails = state === 'ready' || state === 'loading';
+  panel.dataset.state = next;
+  panel.classList.toggle('is-empty', next === 'empty');
+  panel.classList.toggle('is-loading', next === 'loading');
+  panel.classList.toggle('is-error', next === 'error');
+  panel.classList.toggle('is-ready', next === 'ready');
+
+  // Attribute + data-state CSS both gate visibility (prevents dual empty/error UI)
+  const showDetails = next === 'ready' || next === 'loading';
   setHidden(dom.cityDetails, !showDetails);
-  setHidden(dom.currentWeatherHero, state === 'empty');
-  setHidden(dom.weatherEmptyState, state !== 'empty');
-  setHidden(dom.weatherErrorState, state !== 'error');
+  setHidden(dom.currentWeatherHero, !showDetails);
+  setHidden(dom.weatherEmptyState, next !== 'empty');
+  setHidden(dom.weatherErrorState, next !== 'error');
 
-  if (state === 'error' && dom.weatherErrorText) {
-    dom.weatherErrorText.textContent = message || 'Something went wrong. Try another city name.';
+  if (dom.weatherErrorText) {
+    if (next === 'error') {
+      dom.weatherErrorText.textContent =
+        message || 'Check the spelling and try again, or pick a city from your recent list.';
+    } else {
+      dom.weatherErrorText.textContent =
+        'Check the spelling and try again, or pick a city from your recent list.';
+    }
   }
 
   if (dom.weatherStatus) {
-    if (state === 'loading') {
+    if (next === 'loading') {
       dom.weatherStatus.hidden = false;
       dom.weatherStatus.className = 'panel-status is-loading';
       dom.weatherStatus.innerHTML = '<span class="loading-spinner" aria-hidden="true"></span> Loading';
-    } else if (state === 'error') {
+    } else if (next === 'error') {
       dom.weatherStatus.hidden = false;
       dom.weatherStatus.className = 'panel-status is-error';
       dom.weatherStatus.textContent = 'Error';
-    } else if (state === 'ready') {
+    } else if (next === 'ready') {
       dom.weatherStatus.hidden = false;
       dom.weatherStatus.className = 'panel-status is-ready';
       dom.weatherStatus.textContent = 'Live';
     } else {
       dom.weatherStatus.hidden = true;
       dom.weatherStatus.textContent = '';
+      dom.weatherStatus.className = 'panel-status';
     }
   }
 }

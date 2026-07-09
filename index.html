@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://api.openweathermap.org">
   <link rel="preconnect" href="https://openweathermap.org">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Fredoka:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="./assets/css/app.min.css?v=8">
+  <link rel="stylesheet" href="./assets/css/app.min.css?v=9">
   <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/icons/icon-512.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/images/icons/icon-192.png">
   <link rel="icon" type="image/png" sizes="128x128" href="./assets/images/icons/icon-128.png">
@@ -107,7 +107,7 @@
             <span class="panel-status" id="weatherStatus" hidden></span>
           </div>
 
-          <div class="current-weather-hero" id="currentWeatherHero">
+          <div class="current-weather-hero" id="currentWeatherHero" hidden>
             <span class="weather-icon-wrap weather-anim-cloud current-hero-icon-wrap" id="currentWeatherIconWrap">
               <img src="./assets/images/icon.png" alt="" class="current-hero-icon card-icon" id="currentWeatherIcon" width="64" height="64" decoding="async">
             </span>
@@ -116,14 +116,14 @@
 
           <div class="state-block state-empty" id="weatherEmptyState">
             <span class="state-block__icon" aria-hidden="true">☁</span>
-            <p class="state-block__title">No city selected</p>
-            <p class="state-block__text">Search above or pick a recent adventure to load current conditions, air quality, and a 5-day forecast.</p>
+            <p class="state-block__title">Search for a city</p>
+            <p class="state-block__text">Type a city name above, or pick one from Recent Adventures, to load current conditions, air quality, and a 5-day forecast.</p>
           </div>
 
           <div class="state-block state-error" id="weatherErrorState" hidden>
             <span class="state-block__icon" aria-hidden="true">⚠</span>
-            <p class="state-block__title">Couldn’t load weather</p>
-            <p class="state-block__text" id="weatherErrorText">Something went wrong. Try another city name.</p>
+            <p class="state-block__title">Couldn’t load that city</p>
+            <p class="state-block__text" id="weatherErrorText">Check the spelling and try again, or pick a city from your recent list.</p>
           </div>
 
           <div class="city-details" id="cityDetails" hidden>
@@ -236,6 +236,6 @@
     </div>
   </div>
 
-  <script src="./assets/js/app.min.js?v=8" defer></script>
+  <script src="./assets/js/app.min.js?v=9" defer></script>
 </body>
 </html>
