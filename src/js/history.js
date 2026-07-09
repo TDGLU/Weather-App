@@ -27,7 +27,8 @@ export function renderHistory() {
   if (history.length === 0) {
     const li = document.createElement('li');
     li.className = 'history-item history-item--empty';
-    li.textContent = 'No searches yet';
+    li.innerHTML =
+      '<span class="state-block__icon" aria-hidden="true">✦</span><span>No searches yet — your next city shows up here</span>';
     fragment.appendChild(li);
   } else {
     history.forEach((city) => {

@@ -9,6 +9,7 @@ import {
   pickFiveForecastDays
 } from './format.js';
 import { setWeatherIcon } from './icons.js';
+import { confirmDialog, showToast } from './ui-chrome.js';
 
 function loadCompare() {
   try {
@@ -204,10 +205,14 @@ async function renderCompare() {
   compareContainer.replaceChildren();
 
   if (cities.length === 0) {
-    const empty = document.createElement('p');
-    empty.className = 'compare-empty';
+    const empty = document.createElement('div');
+    empty.className = 'compare-empty state-block state-empty';
     empty.id = 'compareEmpty';
-    empty.textContent = 'No cities yet — add one above to start comparing.';
+    empty.innerHTML = `
+      <span class="state-block__icon" aria-hidden="true">⇄</span>
+      <p class="state-block__title">No cities yet</p>
+      <p class="state-block__text">Add a city above — or use Compare from recent adventures — to stack forecasts side by side.</p>
+    `;
     compareContainer.appendChild(empty);
     return;
   }
@@ -226,12 +231,20 @@ async function handleAddCompare(searchVal) {
   if (!result.ok) {
     const { compareInput } = getDom();
     if (compareInput) compareInput.focus();
+    if (result.message) {
+      showToast({ variant: 'info', title: 'Compare', message: result.message });
+    }
     return result;
   }
   const { compareInput } = getDom();
   if (compareInput) compareInput.value = '';
   await renderCompare();
   emitCompareChanged();
+  showToast({
+    variant: 'success',
+    title: 'City added',
+    message: (searchVal || '').trim() || 'Added to comparison'
+  });
   return result;
 }
 
@@ -298,7 +311,20 @@ export function initCompare() {
   if (compareAddCurrent) {
     compareAddCurrent.addEventListener('click', async () => {
       const current = searchedCity?.textContent.trim() ?? '';
-      if (!current || current === 'Enter a city' || current === 'Error') return;
+      if (
+        !current ||
+        current === 'Enter a city' ||
+        current === 'Error' ||
+        current === 'Search for a city' ||
+        current === 'Couldn’t load city'
+      ) {
+        showToast({
+          variant: 'info',
+          title: 'No current city',
+          message: 'Search for a city first, then add it to compare.'
+        });
+        return;
+      }
       setCompareControlsLoading(true);
       await handleAddCompare(current);
       setCompareControlsLoading(false);
@@ -306,10 +332,33 @@ export function initCompare() {
   }
 
   if (compareClearBtn) {
-    compareClearBtn.addEventListener('click', () => {
+    compareClearBtn.addEventListener('click', async () => {
+      const list = loadCompare();
+      if (list.length === 0) {
+        showToast({
+          variant: 'info',
+          title: 'Nothing to clear',
+          message: 'Comparison is already empty.'
+        });
+        return;
+      }
+
+      const ok = await confirmDialog({
+        title: 'Clear comparison?',
+        message: `Remove all ${list.length} cities from the comparison strip?`,
+        confirmLabel: 'Clear all',
+        cancelLabel: 'Keep them'
+      });
+      if (!ok) return;
+
       saveCompare([]);
       emitCompareChanged();
       renderCompare();
+      showToast({
+        variant: 'success',
+        title: 'Comparison cleared',
+        message: 'All compared cities were removed.'
+      });
     });
   }
 }

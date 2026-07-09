@@ -16,6 +16,56 @@ function setText(el, text) {
   if (el) el.textContent = text ?? '—';
 }
 
+function setHidden(el, hidden) {
+  if (!el) return;
+  el.hidden = !!hidden;
+}
+
+/**
+ * @param {'empty'|'loading'|'ready'|'error'} state
+ * @param {string} [message]
+ */
+export function setWeatherPanelState(state, message = '') {
+  const dom = getDom();
+  const panel = dom.currentWeatherPanel;
+  if (!panel) return;
+
+  panel.dataset.state = state;
+  panel.classList.toggle('is-empty', state === 'empty');
+  panel.classList.toggle('is-loading', state === 'loading');
+  panel.classList.toggle('is-error', state === 'error');
+  panel.classList.toggle('is-ready', state === 'ready');
+
+  const showDetails = state === 'ready' || state === 'loading';
+  setHidden(dom.cityDetails, !showDetails);
+  setHidden(dom.currentWeatherHero, state === 'empty');
+  setHidden(dom.weatherEmptyState, state !== 'empty');
+  setHidden(dom.weatherErrorState, state !== 'error');
+
+  if (state === 'error' && dom.weatherErrorText) {
+    dom.weatherErrorText.textContent = message || 'Something went wrong. Try another city name.';
+  }
+
+  if (dom.weatherStatus) {
+    if (state === 'loading') {
+      dom.weatherStatus.hidden = false;
+      dom.weatherStatus.className = 'panel-status is-loading';
+      dom.weatherStatus.innerHTML = '<span class="loading-spinner" aria-hidden="true"></span> Loading';
+    } else if (state === 'error') {
+      dom.weatherStatus.hidden = false;
+      dom.weatherStatus.className = 'panel-status is-error';
+      dom.weatherStatus.textContent = 'Error';
+    } else if (state === 'ready') {
+      dom.weatherStatus.hidden = false;
+      dom.weatherStatus.className = 'panel-status is-ready';
+      dom.weatherStatus.textContent = 'Live';
+    } else {
+      dom.weatherStatus.hidden = true;
+      dom.weatherStatus.textContent = '';
+    }
+  }
+}
+
 export function buildForecastCardMarkup() {
   return `
     <p class="card-date">—</p>

@@ -1,6 +1,6 @@
 # Weather App
 
-A dreamy, glass-style weather dashboard for searching cities, viewing a 5-day forecast, and comparing multiple locations side by side.
+A dreamy **liquid-glass** weather dashboard for searching cities, viewing a 5-day forecast, and comparing multiple locations side by side.
 
 ## Live demo
 
@@ -12,18 +12,20 @@ Every push to `main` runs a production build and deploys with [GitHub Actions](.
 
 ## Features
 
-- **City search** — current temperature, wind, humidity, and conditions
-- **5-day forecast** — daily icon, weather type (e.g. Clear Sky), temp, wind, and humidity
+- **City search** — temperature, wind, humidity, pressure, visibility, sunrise/sunset, and more
+- **5-day forecast** — daily icon, weather type, temp, wind, and humidity
 - **Search history** — unlimited recent cities saved in your browser (scrollable list)
-- **City comparison** — add many cities side by side with current weather and mini 5-day forecasts (up to 10)
-- **Air quality** — iOS-style slider with PM2.5 and quality label
-- **Light / dark mode** — toggle in the top-right; preference is saved locally
+- **City comparison** — side-by-side current weather and mini 5-day forecasts (up to 10)
+- **Air quality** — liquid glass slider with PM2.5 and quality label
+- **Light / dark mode** — theme toggle; optional “match system” preference
+- **Liquid-glass UI** — frosted panels, specular edges, glass form controls, tooltips, toasts, and modals
+- **Empty / loading / error states** — clear panel feedback plus toast notifications
 - **Full location labels** — City, State, Country (e.g. Los Angeles, California, US)
-- **Animated weather icons** — icons match the condition (sun, cloud, rain, etc.)
+- **Animated weather icons** — condition-matched motion (respects reduced motion)
 
 ## Your data stays on your device
 
-Search history, comparison cities, and theme preference are stored only in your browser (`localStorage`). That data is **never** committed to this Git repository. Weather details are fetched from the OpenWeather API when you search.
+Search history, comparison cities, theme, and display prefs are stored only in your browser (`localStorage`). That data is **never** committed to this Git repository. Weather details are fetched from the OpenWeather API when you search.
 
 ## Run locally
 
@@ -45,39 +47,50 @@ npm run dev
 
 ```
 Weather-App/
-├── index.html                 # App shell
+├── index.html                 # App shell (liquid-glass layout)
 ├── assets/                    # Deployed static output (built)
 │   ├── css/app.min.css
 │   ├── js/app.min.js
 │   ├── js/theme-init.js       # Tiny theme bootstrap (no flash)
 │   └── images/
 ├── src/                       # Source files
-│   ├── css/main.css
+│   ├── css/main.css           # Design system + components
 │   └── js/
 │       ├── app.js             # Entry point
 │       ├── api.js             # OpenWeather + caching
-│       ├── cache.js
-│       ├── compare.js
-│       ├── config.js
-│       ├── dom.js
-│       ├── format.js
-│       ├── history.js
-│       ├── icons.js
-│       ├── theme.js
-│       ├── aqi.js
-│       └── weather-ui.js
+│       ├── ui-chrome.js       # Toasts + confirm modal
+│       ├── prefs.js           # Display preferences
+│       └── …                  # See src/js/README.md
 ├── scripts/
 │   ├── build.mjs
 │   ├── capture-screenshot.mjs
-│   └── render-icon.mjs
+│   └── generate-icons.mjs
 └── .github/workflows/deploy.yml
 ```
+
+Every folder includes a `README.md` describing purpose, key files, relationships, and patterns.
+
+## Liquid-glass design system
+
+The stylesheet (`src/css/main.css`) defines shared glass tokens and styles for:
+
+| Surface | Classes / hooks |
+|---------|-----------------|
+| Panels | `.panel`, `.glass-liquid` |
+| Selects / dropdowns | `.glass-select`, `.glass-dropdown` |
+| Popovers / modals | `.popover`, `.modal`, `.modal-backdrop` |
+| Tooltips | `[data-tooltip]`, `.tooltip` |
+| Scrollbars | Global thin liquid thumbs |
+| Checkboxes / radios / toggles | `.glass-check`, `.glass-radio`, `.glass-toggle` |
+| Sliders / AQI | `.glass-slider`, `.aqi-visual` |
+| Number steppers | `.glass-stepper` |
+| States | `.state-empty`, `.state-loading`, `.state-error`, toasts |
 
 ## Performance
 
 - **esbuild** bundles and minifies assets into `app.min.js` and `app.min.css`
 - **In-memory API cache** (10 min TTL) and in-flight deduplication for faster city switches
-- **Non-blocking fonts** via `<link>` + `preconnect` (no render-blocking `@import`)
+- **Non-blocking fonts** via `<link>` + `preconnect`
 - **Lean HTML** — forecast cards generated once in JS
 - **CSS `contain` and `content-visibility`** for smoother scrolling and painting
 

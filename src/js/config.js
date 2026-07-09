@@ -2,6 +2,7 @@ export const API_KEY = '7b23df2e93e0f4913efaf4a0404c91c0';
 export const HISTORY_KEY = 'weatherAppHistory';
 export const COMPARE_KEY = 'weatherAppCompare';
 export const THEME_KEY = 'weatherAppTheme';
+export const PREFS_KEY = 'weatherAppPrefs';
 export const MAX_COMPARE = 10;
 export const CACHE_TTL_MS = 10 * 60 * 1000;
 

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://api.openweathermap.org">
   <link rel="preconnect" href="https://openweathermap.org">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Fredoka:wght@500;600;700&display=swap">
-  <link rel="stylesheet" href="./assets/css/app.min.css?v=6">
+  <link rel="stylesheet" href="./assets/css/app.min.css?v=7">
   <link rel="icon" type="image/png" sizes="512x512" href="./assets/images/icons/icon-512.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/images/icons/icon-192.png">
   <link rel="icon" type="image/png" sizes="128x128" href="./assets/images/icons/icon-128.png">
@@ -30,16 +30,19 @@
     <span class="bubble bubble-3"></span>
     <span class="bubble bubble-4"></span>
     <span class="bubble bubble-5"></span>
+    <span class="bubble bubble-6"></span>
   </div>
 
   <div class="container">
-    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" title="Toggle light / dark mode">
+    <button type="button" class="theme-toggle glass-liquid" id="themeToggle" aria-label="Switch to dark mode" title="Toggle light / dark mode" data-tooltip="Toggle light / dark">
       <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
       <span class="theme-icon theme-icon-moon" aria-hidden="true">☽</span>
     </button>
 
     <header class="title">
-      <div class="panel title-panel">
+      <div class="panel title-panel glass-liquid">
+        <span class="title-orb title-orb-1" aria-hidden="true"></span>
+        <span class="title-orb title-orb-2" aria-hidden="true"></span>
         <h1>Weather App</h1>
         <p class="title-tagline">Your cozy little sky snapshot</p>
       </div>
@@ -51,13 +54,41 @@
 
     <div class="content-section">
       <aside class="sidebar">
-        <div class="panel search-section">
+        <div class="panel search-section glass-liquid">
           <h3 class="search-for-a-city">Search for a City</h3>
+          <label class="visually-hidden" for="searchText">City name</label>
           <input class="city-search" type="text" placeholder="City name" id="searchText" autocomplete="off" spellcheck="false">
           <button class="search-btn" id="searchBtn" type="button">Search</button>
+
+          <div class="prefs-bar" aria-label="Display preferences">
+            <span class="prefs-bar__label">Prefs</span>
+            <div class="prefs-bar__group">
+              <label class="glass-toggle" data-tooltip="Save theme with OS preference">
+                <input type="checkbox" id="prefFollowSystem" />
+                <span class="glass-toggle__track">
+                  <span class="glass-toggle__thumb"></span>
+                </span>
+                <span>Match system</span>
+              </label>
+            </div>
+            <div class="prefs-bar__group">
+              <label class="glass-check" for="prefCompactStats" data-tooltip="Tighter stat pills">
+                <input type="checkbox" id="prefCompactStats" checked />
+                <span class="glass-check__box" aria-hidden="true"></span>
+                <span>Compact stats</span>
+              </label>
+            </div>
+            <div class="prefs-bar__group">
+              <label class="visually-hidden" for="prefMotion">Motion</label>
+              <select class="glass-select" id="prefMotion" data-tooltip="Animation intensity">
+                <option value="full">Full motion</option>
+                <option value="reduced">Calmer motion</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div class="panel history-panel">
+        <div class="panel history-panel glass-liquid">
           <p class="history-title">Recent Adventures</p>
           <ul class="history scroll-region" id="history" data-scroll-axis="y"></ul>
           <div class="clearHistoryContainer">
@@ -67,64 +98,81 @@
       </aside>
 
       <main class="main-content">
-        <section class="panel current-weather">
-          <h2 class="searched-city" id="searchedCity">Search for a city</h2>
-          <div class="current-weather-hero">
+        <section class="panel current-weather glass-liquid is-empty" id="currentWeatherPanel" data-state="empty">
+          <div class="current-weather-header">
+            <h2 class="searched-city" id="searchedCity">Search for a city</h2>
+            <span class="panel-status" id="weatherStatus" hidden></span>
+          </div>
+
+          <div class="current-weather-hero" id="currentWeatherHero">
             <span class="weather-icon-wrap weather-anim-cloud current-hero-icon-wrap" id="currentWeatherIconWrap">
               <img src="./assets/images/icon.png" alt="" class="current-hero-icon card-icon" id="currentWeatherIcon" width="64" height="64" decoding="async">
             </span>
             <p class="current-weather-desc weather-type-label" id="currentWeatherDesc">—</p>
           </div>
-          <div class="city-details" id="cityDetails">
-            <div class="stat-pill stat-pill-compact">
+
+          <div class="state-block state-empty" id="weatherEmptyState">
+            <span class="state-block__icon" aria-hidden="true">☁</span>
+            <p class="state-block__title">No city selected</p>
+            <p class="state-block__text">Search above or pick a recent adventure to load current conditions, air quality, and a 5-day forecast.</p>
+          </div>
+
+          <div class="state-block state-error" id="weatherErrorState" hidden>
+            <span class="state-block__icon" aria-hidden="true">⚠</span>
+            <p class="state-block__title">Couldn’t load weather</p>
+            <p class="state-block__text" id="weatherErrorText">Something went wrong. Try another city name.</p>
+          </div>
+
+          <div class="city-details" id="cityDetails" hidden>
+            <div class="stat-pill stat-pill-compact" data-tooltip="Current temperature">
               <span class="stat-label">Temp</span>
               <span class="stat-value"><span id="currentCityTemp">—</span><span class="stat-unit">°F</span></span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Apparent temperature">
               <span class="stat-label">Feels like</span>
               <span class="stat-value"><span id="currentFeelsLike">—</span><span class="stat-unit">°F</span></span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Daily high and low from the current reading">
               <span class="stat-label">High / Low</span>
               <span class="stat-value" id="currentHighLow">—</span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Relative humidity">
               <span class="stat-label">Humidity</span>
               <span class="stat-value"><span id="currentCityHumidity">—</span><span class="stat-unit">%</span></span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Wind speed and direction">
               <span class="stat-label">Wind</span>
               <span class="stat-value" id="currentWind">—</span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Peak wind gusts">
               <span class="stat-label">Gusts</span>
               <span class="stat-value" id="currentGust">—</span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Atmospheric pressure">
               <span class="stat-label">Pressure</span>
               <span class="stat-value" id="currentPressure">—</span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Horizontal visibility">
               <span class="stat-label">Visibility</span>
               <span class="stat-value" id="currentVisibility">—</span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Cloud cover percentage">
               <span class="stat-label">Clouds</span>
               <span class="stat-value"><span id="currentClouds">—</span><span class="stat-unit">%</span></span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Precipitation in the last hour">
               <span class="stat-label">Precip (1h)</span>
               <span class="stat-value" id="currentPrecip">—</span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Local sunrise time">
               <span class="stat-label">Sunrise</span>
               <span class="stat-value" id="currentSunrise">—</span>
             </div>
-            <div class="stat-pill stat-pill-compact">
+            <div class="stat-pill stat-pill-compact" data-tooltip="Local sunset time">
               <span class="stat-label">Sunset</span>
               <span class="stat-value" id="currentSunset">—</span>
             </div>
-            <div class="stat-pill stat-pill-compact stat-pill-aqi">
+            <div class="stat-pill stat-pill-compact stat-pill-aqi" data-tooltip="OpenWeather air quality index (1–5)">
               <span class="stat-label">Air quality</span>
               <div class="aqi-visual" id="currentAqiVisual" data-aqi="0" role="slider" aria-label="Air quality index" aria-valuemin="1" aria-valuemax="5" aria-valuenow="0">
                 <div class="aqi-slider-track">
@@ -146,7 +194,7 @@
       </main>
     </div>
 
-    <section class="panel compare-section">
+    <section class="panel compare-section glass-liquid">
       <div class="compare-header">
         <div>
           <h3 class="compare-title">City Comparison</h3>
@@ -155,18 +203,36 @@
         <button type="button" class="compare-add-current" id="compareAddCurrent">+ Add current city</button>
       </div>
       <div class="compare-add-row">
+        <label class="visually-hidden" for="compareInput">Add city to compare</label>
         <input class="city-search compare-search" type="text" placeholder="Add another city..." id="compareInput" autocomplete="off" spellcheck="false">
         <button type="button" class="search-btn compare-add-btn" id="compareAddBtn">Add</button>
         <button type="button" class="compare-clear-btn" id="compareClearBtn">Clear all</button>
       </div>
       <div class="compare-scroll scroll-region" data-scroll-axis="x" aria-label="City comparison">
         <div class="compare-container" id="compareContainer">
-          <p class="compare-empty" id="compareEmpty">No cities yet — add one above to start comparing.</p>
+          <div class="compare-empty state-block state-empty" id="compareEmpty">
+            <span class="state-block__icon" aria-hidden="true">⇄</span>
+            <p class="state-block__title">No cities yet</p>
+            <p class="state-block__text">Add a city above — or use Compare from recent adventures — to stack forecasts side by side.</p>
+          </div>
         </div>
       </div>
     </section>
   </div>
 
-  <script src="./assets/js/app.min.js?v=6" defer></script>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-relevant="additions"></div>
+
+  <div class="modal-backdrop" id="confirmModal" hidden>
+    <div class="modal glass-liquid" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle" aria-describedby="confirmModalBody">
+      <h3 class="modal-title" id="confirmModalTitle">Are you sure?</h3>
+      <p class="modal-body" id="confirmModalBody">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="confirmModalCancel">Cancel</button>
+        <button type="button" class="btn-danger" id="confirmModalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./assets/js/app.min.js?v=7" defer></script>
 </body>
 </html>
